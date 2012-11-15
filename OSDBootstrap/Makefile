@@ -13,7 +13,7 @@ HEXER=python ../hexer.py
 all: osdload.hex
 
 clean:
-	rm -f osdload.hex osdload.bin
+	rm -f osdload.hex osdload.bin osdload.elf
 	
 %.hex: %.bin
 	$(HEXER) -l 2048 $< $@

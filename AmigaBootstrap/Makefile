@@ -13,7 +13,7 @@ HEXER=python ../hexer.py
 all: amigaboot.hex
 
 clean:
-	rm -f amigaboot.hex amigaboot.bin
+	rm -f amigaboot.hex amigaboot.bin amigaboot.elf
 	
 %.hex: %.bin
 	$(HEXER) -l 2048 $< $@
