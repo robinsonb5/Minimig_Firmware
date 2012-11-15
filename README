@@ -1,0 +1,8 @@
+Minimig Firmware is a shared repository containing bootstrap and OSD firmware
+for certain variants of the Minimig project.
+
+Currently the firmware is directly usable with the Turbo Chameleon 64 and
+Generic C3 board ports.  The long-term goal is to get M68K (Chameleon/C3),
+OR32 (DE1) and ARM (Original Minimig) firmware all buildable from a single
+repository which will be used as a git subproject by the toplevel projects.
+
