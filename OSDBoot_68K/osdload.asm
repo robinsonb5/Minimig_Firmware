@@ -120,11 +120,10 @@ start3
 			bsr		put_msg
 			
 start2     bra.s     start2
-;       xdef      _exit
+
 notfound   dc.b "not "
 found_MM   dc.b	"found "
-;mmio_name:	dc.b	"MENUE   SYS",0
-mmio_name:	dc.b	"OSD_CA01SYS",0
+mmio_name:	dc.b	"OSD68K01SYS",0
 
 
 ;__putch:                           ; Basic character output routine

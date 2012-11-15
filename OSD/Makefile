@@ -2,22 +2,25 @@ C_SRC=fat.c fdd.c fpga.c hardware.c  hdd.c main.c menu.c mmc.c osd.c printf.c sw
 KLIBC_SRC=vsnprintf.c sprintf.c memcpy.c memcmp.c strcpy.c strcat.c strncat.c strncmp.c strlen.c memset.c strncpy.c strchr.c
 A_SRC=startup.s
 
-BUILD_DIR=BUILD
+# Supply these as parameters from higher up.
+TARGET=m68k-elf
+ARCH=68000
+
+BUILD_DIR=$(TARGET)-build
 C_OBJ=$(patsubst %.c,$(BUILD_DIR)/%.o,$(C_SRC))
 LIBC_OBJ=$(patsubst %.c,$(BUILD_DIR)/%.o,$(KLIBC_SRC))
 A_OBJ=$(patsubst %.s,$(BUILD_DIR)/%.o,$(A_SRC))
 OBJ=$(C_OBJ) $(A_OBJ)
 
-ARCH=68000
-CC=m68k-elf-gcc
-AR=m68k-elf-ar
-OBJCOPY=m68k-elf-objcopy
+CC=$(TARGET)-gcc
+AR=$(TARGET)-ar
+OBJCOPY=$(TARGET)-objcopy
 CFLAGS+=-m$(ARCH) -Wall -Wno-char-subscripts -Os -fno-common -fomit-frame-pointer -I./include -DACTIONREPLAY_BROKEN
 LDFLAGS+=-m$(ARCH) -Xlinker -Map=menu.map -nostartfiles -L.
 
-ELF=menu.elf
-OUTPUT=OSD_CA01.sys
-LINK_SCRIPT=osdcpu.ld
+ELF=$(BUILD_DIR)/menu.elf
+OUTPUT=OSD68K01.sys
+LINK_SCRIPT=osd_$(TARGET).ld
 LIBC_TARGET=libc.a
 
 all: $(BUILD_DIR) $(LIBC_TARGET) $(OUTPUT)
@@ -45,3 +48,4 @@ $(BUILD_DIR)/%.o: klibc/%.c
 
 $(BUILD_DIR)/%.o: %.s
 	$(CC) $(CFLAGS) -c -o $@ $<
+

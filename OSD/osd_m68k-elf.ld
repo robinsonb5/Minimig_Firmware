@@ -2,7 +2,7 @@ SECTIONS
 {
 	. = 0x2000;
 	.code : {
-	  BUILD/startup.o (.text)
+	  m68k-elf-build/startup.o (.text)
 	  *(.text)
 	  *(.rodata)
 	  *(.rodata.*)
