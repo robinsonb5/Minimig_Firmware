@@ -1,10 +1,10 @@
-C_SRC=fat.c fdd.c fpga.c hardware.c  hdd.c main.c menu.c mmc.c osd.c printf.c swap.c config.c rafile.c
-KLIBC_SRC=vsnprintf.c sprintf.c memcpy.c memcmp.c strcpy.c strcat.c strncat.c strncmp.c strlen.c memset.c strncpy.c strchr.c
-A_SRC=startup.s
-
 # Supply these as parameters from higher up.
 TARGET=m68k-elf
 ARCH=68000
+
+C_SRC=fat.c fdd.c fpga.c hardware.c  hdd.c main.c menu.c mmc.c osd.c printf.c swap.c config.c rafile.c
+KLIBC_SRC=vsnprintf.c sprintf.c memcpy.c memcmp.c strcpy.c strcat.c strncat.c strncmp.c strlen.c memset.c strncpy.c strchr.c
+A_SRC=startup_$(TARGET).s
 
 BUILD_DIR=$(TARGET)-build
 C_OBJ=$(patsubst %.c,$(BUILD_DIR)/%.o,$(C_SRC))
