@@ -558,7 +558,7 @@ void HandleUI(void)
 	        OsdWrite(2, "    Return to Chameleon", menusub == 1,0);
 		else
 		{
-	        OsdWrite(3, "", 0,0);
+	        OsdWrite(2, "", 0,0);
 			menumask&=~0x02;	// Remove the Reconfigure option from the menu
 		}
 //        OsdWrite(3, "    (Not yet implemented)", 0,1);
