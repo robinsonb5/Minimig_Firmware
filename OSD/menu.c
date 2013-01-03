@@ -174,6 +174,7 @@ void HandleUI(void)
     unsigned char i, c, up, down, select, menu, right, left, plus, minus;
     unsigned long len;
     static hardfileTYPE t_hardfile[2]; // temporary copy of former hardfile configuration
+    static char t_enable_ide; // temporary copy of former enable_ide flag.
     static unsigned char ctrl = false;
     static unsigned char lalt = false;
 	char enable;
@@ -456,10 +457,11 @@ void HandleUI(void)
 			}
             else if (menusub == 5)	// Go to harddrives page.
 			{
-                 t_hardfile[0] = config.hardfile[0];
-                 t_hardfile[1] = config.hardfile[1];
-                 menustate = MENU_SETTINGS_HARDFILE1;
-				 menusub=0;
+                t_hardfile[0] = config.hardfile[0];
+                t_hardfile[1] = config.hardfile[1];
+                menustate = MENU_SETTINGS_HARDFILE1;
+				menusub=0;
+				t_enable_ide=config.enable_ide;
 			}
             else if (menusub == 6)
                 menustate = MENU_NONE1;
@@ -1125,7 +1127,7 @@ void HandleUI(void)
         strcat(s, config_memory_slow_msg[config.memory >> 2 & 0x03]);
         OsdWrite(2, s, menusub == 1,0);
         strcpy(s, "        Fast : ");
-        strcat(s, config_memory_fast_msg[config.fastram % 5]);
+        strcat(s, config_memory_fast_msg[(config.fastram&0x7f) % 5]);
         OsdWrite(3, s, menusub == 2,0);
 
 		if(PLATFORM&(1<<PLATFORM_TURBOCHIP))
@@ -1540,13 +1542,12 @@ void HandleUI(void)
 
      // check if hardfile configuration has changed
     case MENU_HARDFILE_EXIT :
-		// FIXME - check enabled bit here too.
-         if (memcmp(config.hardfile, t_hardfile, sizeof(t_hardfile)) != 0)
+         if ((memcmp(config.hardfile, t_hardfile, sizeof(t_hardfile)) != 0) || (t_enable_ide!=config.enable_ide))
          {
              menustate = MENU_HARDFILE_CHANGED1;
              menusub = 1;
          }
-         else
+         else 
          {
              menustate = MENU_MAIN1;
              menusub = 5;
@@ -1608,7 +1609,7 @@ void HandleUI(void)
             {
                 memcpy(config.hardfile, t_hardfile, sizeof(t_hardfile)); // restore configuration
                 menustate = MENU_MAIN1;
-                menusub = 3;
+                menusub = 5;
             }
         }
 
@@ -1616,7 +1617,7 @@ void HandleUI(void)
         {
             memcpy(config.hardfile, t_hardfile, sizeof(t_hardfile)); // restore configuration
             menustate = MENU_MAIN1;
-            menusub = 3;
+            menusub = 5;
         }
         break;
 
