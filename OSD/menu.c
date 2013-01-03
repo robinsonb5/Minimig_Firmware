@@ -1185,7 +1185,7 @@ void HandleUI(void)
             else if (menusub == 2)
             {
 				// Fast RAM config values 0 through 4 are valid, bit 7 is Turbo ChipRAM.
-                config.fastram = ((config.fastram + 0x1) % 0x5) | (config.fastram & ~0x7);
+                config.fastram = (((config.fastram&0x07) + 0x1) % 0x5) | (config.fastram & ~0x7);
 //                if ((config.memory & 0x30) == 0x30)
 //					config.memory -= 0x30;
 //				if (!(config.disable_ar3 & 0x01)&&(config.memory & 0x20))
@@ -1607,6 +1607,7 @@ void HandleUI(void)
             }
             else if (menusub == 1) // no
             {
+				config.enable_ide=t_enable_ide; // Restore IDE on/off
                 memcpy(config.hardfile, t_hardfile, sizeof(t_hardfile)); // restore configuration
                 menustate = MENU_MAIN1;
                 menusub = 5;
