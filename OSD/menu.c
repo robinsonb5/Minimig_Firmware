@@ -1557,6 +1557,7 @@ void HandleUI(void)
 
     // hardfile configuration has changed, ask user if he wants to use the new settings
     case MENU_HARDFILE_CHANGED1 :
+		helptext=helptexts[HELPTEXT_NONE];
         OsdColor(OSDCOLOR_WARNING);
 		menumask=0x03;
 		parentstate=menustate;
@@ -1623,6 +1624,7 @@ void HandleUI(void)
         break;
 
     case MENU_SYNTHRDB1 :
+		helptext=helptexts[HELPTEXT_NONE];
 		menumask=0x01;
 		parentstate=menustate;
  		OsdSetTitle("Warning",0);
@@ -1640,7 +1642,7 @@ void HandleUI(void)
 
 
     case MENU_SYNTHRDB2_1 :
-
+		helptext=helptexts[HELPTEXT_NONE];
 		menumask=0x01;
 		parentstate=menustate;
  		OsdSetTitle("Warning",0);
@@ -1766,6 +1768,7 @@ void HandleUI(void)
          // no break intended
 
     case MENU_ROMFILE_SELECTED1 :
+		helptext=helptexts[HELPTEXT_NONE];
         OsdColor(OSDCOLOR_WARNING);
 		menumask=0x03;
 		parentstate=menustate;
@@ -1807,14 +1810,14 @@ void HandleUI(void)
             else if (menusub == 1)
             {
                 menustate = MENU_SETTINGS_MEMORY1;
-                menusub = 2;
+                menusub = 4;
             }
         }
 
         if (menu)
         {
             menustate = MENU_SETTINGS_MEMORY1;
-            menusub = 2;
+            menusub = 4;
         }
         break;
 
