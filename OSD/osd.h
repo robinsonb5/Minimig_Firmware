@@ -93,7 +93,7 @@ void OsdReset(unsigned char boot);
 //void OsdReconfig();	// Reset to Chameleon core.
 void ConfigFilter(unsigned char lores, unsigned char hires);
 void ConfigMemory(unsigned char memory);
-void ConfigFastRAM(unsigned char memory);
+//void ConfigFastRAM(unsigned short memory);
 void ConfigCPU(unsigned char cpu);
 void ConfigChipset(unsigned char chipset);
 void ConfigFloppy(unsigned char drives, unsigned char speed);

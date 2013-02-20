@@ -198,15 +198,20 @@ unsigned long CheckTimer(unsigned long time)
 //    return(time > systimer);
 }
 
+
 void WaitTimer(unsigned long time)
 {
     time = GetTimer(time);
     while (!CheckTimer(time));
 }
 
-void ConfigFastRAM(unsigned char memory)
+
+void ConfigFastRAM(unsigned short memory)
 {
-	short mem=((memory&0x80)<<8)|(memory&0x07); // Map bit 8 to bit 16 (turbo chip)
+	short mem=memory&0xff7f;
+	if(memory&0x80)
+		mem|=0x8000; // Map bit 7 to bit 15 (turbo chip)
+
 	if(mem & 0x04)
 		mem |=0x3;	// Map 0x4 -> 0x7
 	PLATFORM=mem;

@@ -213,11 +213,18 @@ unsigned char LoadConfiguration(char *filename)
 	}
 
     key = OsdGetCtrl();
-    if (key == KEY_F1)
-       config.chipset |= CONFIG_NTSC; // force NTSC mode if F1 pressed
+	sprintf(s,"Got key: %x\n",key);
+    BootPrint(s);
+    if ((key == KEY_F1) || (key == KEY_F3))
+       config.chipset |= CONFIG_NTSC; // force NTSC mode if F1 or F3 pressed
 
-    if (key == KEY_F2)
-       config.chipset &= ~CONFIG_NTSC; // force PAL mode if F2 pressed
+    if ((key == KEY_F2) || (key == KEY_F4))
+       config.chipset &= ~CONFIG_NTSC; // force PAL mode if F2 or F4 pressed
+
+	if ((key == KEY_F3) || (key == KEY_F4))
+		config.misc &= ~(1<<(PLATFORM_SCANDOUBLER-8));	// High byte of platform register
+	if ((key == KEY_F1) || (key == KEY_F2))
+		config.misc |= 1<<(PLATFORM_SCANDOUBLER-8);  // High byte of platform register
 
 	ApplyConfiguration(updatekickstart);
 
@@ -228,6 +235,7 @@ unsigned char LoadConfiguration(char *filename)
 void ApplyConfiguration(char reloadkickstart)
 {
     ConfigCPU(config.cpu);
+	ConfigFastRAM((config.misc<<8)|config.fastram);
 
 	if(reloadkickstart)
 	{
@@ -352,7 +360,6 @@ void ApplyConfiguration(char reloadkickstart)
     ConfigCPU(config.cpu);
     ConfigFilter(config.filter.lores, config.filter.hires);
     ConfigScanlines(config.scanlines);
-	ConfigFastRAM(config.fastram);
 
 	if(reloadkickstart)
 	{

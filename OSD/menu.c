@@ -1191,13 +1191,13 @@ void HandleUI(void)
 //				if (!(config.disable_ar3 & 0x01)&&(config.memory & 0x20))
 //                    config.memory &= ~0x30;
                 menustate = MENU_SETTINGS_MEMORY1;
-                ConfigFastRAM(config.fastram);
+                ConfigFastRAM((config.misc<<8)|config.fastram);
             }
             else if (menusub == 3)
             {
 				config.fastram^=0x80;
                 menustate = MENU_SETTINGS_MEMORY1;
-                ConfigFastRAM(config.fastram);
+                ConfigFastRAM((config.misc<<8)|config.fastram);
             }
             else if (menusub == 4)
             {
