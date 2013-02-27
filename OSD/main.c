@@ -174,6 +174,14 @@ __geta4 void main(void)
 	df[2].status = 0;
 	df[3].status = 0;
 
+	{
+		unsigned long romdir;
+		if((romdir=FindDirectory(0,"ROMS       ")))
+		{
+			ChangeDirectory(romdir);
+		}
+	}
+
 	config.kickstart.name[0]=0;
 	SetConfigurationFilename(0); // Use default config
     LoadConfiguration(0);	// Use slot-based config filename

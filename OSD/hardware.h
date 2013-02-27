@@ -78,6 +78,8 @@
 #define RS232  *(volatile unsigned char *)0xda8001=
  
 
+#define RAMFUNC  // Used by ARM
+
 //void USART_Init(unsigned long baudrate);
 //void USART_Write(unsigned char c);
 //

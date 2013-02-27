@@ -1,9 +1,11 @@
 #ifndef _FAT16_H_INCLUDED
 #define _FAT16_H_INCLUDED
 
+#include "hardware.h"
+
 #define MAXDIRENTRIES 8
 
-// FIXME - derive CHS address from FAT boot sector for card and partition mount modes.
+extern unsigned char secbuf[512];
 
 typedef struct
 {
@@ -21,21 +23,21 @@ typedef struct
     unsigned long cluster;         /* current cluster */
     unsigned long start_cluster;   /* first cluster of file */
     char          long_name[261];
-} fileTYPE;
+}  fileTYPE;
 
 struct PartitionEntry
 {
 	unsigned char geometry[8];		// ignored
 	unsigned long startlba;
 	unsigned long sectors;
-};
+} __attribute__ ((packed));
 
 struct MasterBootRecord
 {
 	unsigned char bootcode[446];	// ignored
 	struct PartitionEntry Partition[4];	// We copy these (and byteswap if need be)
 	unsigned short Signature;		// This lets us detect an MBR (and the need for byteswapping).
-};
+} __attribute__ ((packed));
 
 extern struct PartitionEntry partitions[4];	// FirstBlock and LastBlock will be byteswapped as necessary
 extern int partitioncount;
@@ -111,12 +113,14 @@ extern unsigned char fat32;
 // functions
 unsigned char FindDrive(void);
 unsigned long GetFATLink(unsigned long cluster);
-unsigned char FileNextSector(fileTYPE *file);
+unsigned char FileNextSector(fileTYPE *file) RAMFUNC;
 unsigned char FileOpen(fileTYPE *file, const char *name);
 unsigned char FileSeek(fileTYPE *file, unsigned long offset, unsigned long origin);
-unsigned char FileRead(fileTYPE *file, unsigned char *pBuffer);
+unsigned char FileRead(fileTYPE *file, unsigned char *pBuffer) RAMFUNC;
 unsigned char FileWrite(fileTYPE *file, unsigned char *pBuffer);
 unsigned char FileReadEx(fileTYPE *file, unsigned char *pBuffer, unsigned long nSize);
+
+unsigned long FindDirectory(unsigned long parent, const char *name); // Returns first cluster of directory.
 
 unsigned char FileCreate(unsigned long iDirectory, fileTYPE *file);
 unsigned char UpdateEntry(fileTYPE *file);
