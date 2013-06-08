@@ -665,6 +665,8 @@ void HandleUI(void)
 			SetConfigurationFilename(2); if(ConfigurationExists(0)) menumask|=0x04;
 			SetConfigurationFilename(3); if(ConfigurationExists(0)) menumask|=0x08;
 			SetConfigurationFilename(4); if(ConfigurationExists(0)) menumask|=0x10;
+			if(!(menumask&0x1f))
+				menusub=5;
 		}
 		parentstate=menustate;
  		OsdSetTitle("Load",0);
@@ -683,14 +685,15 @@ void HandleUI(void)
 
     case MENU_LOADCONFIG_2 :
 
-        if (down)
-        {
+//        if (down)
+//        {
 //            if (menusub < 3)
-            if (menusub < 5)
-                menusub++;
-            menustate = MENU_LOADCONFIG_1;
-        }
-        else if (select)
+//            if (menusub < 5)
+//                menusub++;
+//            menustate = MENU_LOADCONFIG_1;
+//        }
+//        else if (select)
+		if(select)
         {
 			if(menusub<5)
 			{
@@ -862,6 +865,8 @@ void HandleUI(void)
 
                     menustate = fs_MenuSelect;
                 }
+				else
+					menustate = MENU_MAIN1;	// Return to main menu if user selects the "No files!" line
             }
         }
 

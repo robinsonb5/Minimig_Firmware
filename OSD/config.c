@@ -194,6 +194,7 @@ unsigned char LoadConfiguration(char *filename)
 		memset((void*)&config, 0, sizeof(config));	// Finally found default config bug - params were reversed!
 		strncpy(config.id, config_id, sizeof(config.id));
 		strncpy(config.kickstart.name, "KICK    ", sizeof(config.kickstart.name));
+		config.misc = 1<<(PLATFORM_SCANDOUBLER-8);  // High byte of platform register - enable scandoubler by default
 		config.kickstart.long_name[0] = 0;
 		config.memory = 0x15;
 		config.cpu = 0;

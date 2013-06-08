@@ -774,6 +774,7 @@ unsigned char OsdGetCtrl(void)
     {
         c1 = KEY_MENU;
         delay = GetTimer(-1);
+        repeat = GetTimer(REPEATDELAY);
     }
 
     // generate normal "key-pressed" event
