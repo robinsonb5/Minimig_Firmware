@@ -322,7 +322,10 @@ void HandleUI(void)
             menustate = parentstate;
         }
 
-        if (up && menusub > 0 && (menumask<<(8-menusub)))
+		// ...mmmm.
+		// ......X.
+
+        if (up && (menusub > 0) && (menumask&(0xff>>(8-menusub))))
         {
 			do
 				--menusub;

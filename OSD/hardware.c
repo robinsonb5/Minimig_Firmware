@@ -170,7 +170,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 unsigned long CheckButton(void)
 {
 //    return((~*AT91C_PIOA_PDSR) & BUTTON);
-	return((PLATFORM&(1<<PLATFORM_MENUBUTTON))==0);
+	return((PLATFORM&(1<<PLATFORM_MENUBUTTON))!=0);
 //		return(0);
 }
 
