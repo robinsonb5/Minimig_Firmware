@@ -1,5 +1,6 @@
 unsigned long SwapBBBB(unsigned long i)
 {
+#ifdef _M68K
 	asm volatile
 	(
 		"rol.w #8,%0\n\t"
@@ -10,10 +11,18 @@ unsigned long SwapBBBB(unsigned long i)
 	: /* no clobber */
 	);	
 	return i;
+#else
+	int result=(i>>24)&0xff;
+	result|=(i>>8)&0xff00;
+	result|=(i<<8)&0xff0000;
+	result|=(i<<24)&0xff00000;
+	return(result);
+#endif
 }
 
 unsigned int SwapBB(unsigned int i)
 {
+#ifdef _M68K
 	asm volatile
 	(
 		"rol.w #8,%0\n\t"
@@ -22,10 +31,16 @@ unsigned int SwapBB(unsigned int i)
 	: /* no clobber */
 	);	
 	return i;
+#else
+	short result=(i>>8)&0xff;
+	result|=(i<<8)&0xff00;
+	return(result);
+#endif
 }
 
 unsigned long SwapWW(unsigned long i)
 {
+#ifdef _M68K
 	asm volatile
 	(
 		"swap %0\n\t"
@@ -34,4 +49,9 @@ unsigned long SwapWW(unsigned long i)
 	: /* no clobber */
 	);	
 	return i;
+#else
+	int result=(i>>16)&0xffff;
+	result|=(i<<16)&0xffff0000;
+	return(result);
+#endif
 }

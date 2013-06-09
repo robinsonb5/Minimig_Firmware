@@ -1,6 +1,8 @@
 # Supply these as parameters from higher up.
 TARGET=m68k-elf
 ARCH=68000
+DEFS=
+ID=68K
 
 C_SRC=fat.c fdd.c fpga.c hardware.c  hdd.c main.c menu.c mmc.c osd.c printf.c swap.c config.c rafile.c
 KLIBC_SRC=vsnprintf.c sprintf.c memcpy.c memcmp.c strcpy.c strcat.c strncat.c strncmp.c strlen.c memset.c strncpy.c strchr.c
@@ -15,13 +17,13 @@ OBJ=$(C_OBJ) $(A_OBJ)
 CC=$(TARGET)-gcc
 AR=$(TARGET)-ar
 OBJCOPY=$(TARGET)-objcopy
-CFLAGS+=-m$(ARCH) -Wall -Wno-char-subscripts -Os -fno-common -fomit-frame-pointer -I./include -DACTIONREPLAY_BROKEN
-LDFLAGS+=-m$(ARCH) -Xlinker -Map=menu.map -nostartfiles -L.
+CFLAGS+=$(DEFS) -m$(ARCH) -Wall -Wno-char-subscripts -Os -fno-common -fomit-frame-pointer -I./include -DACTIONREPLAY_BROKEN
+LDFLAGS+=-m$(ARCH) -Xlinker -Map=menu.map -nostartfiles -L$(BUILD_DIR)
 
 ELF=$(BUILD_DIR)/menu.elf
-OUTPUT=OSD68K01.sys
+OUTPUT=OSD$(ID)01.sys
 LINK_SCRIPT=osd_$(TARGET).ld
-LIBC_TARGET=libc.a
+LIBC_TARGET=$(BUILD_DIR)/libc.a
 
 all: $(BUILD_DIR) $(LIBC_TARGET) $(OUTPUT)
 

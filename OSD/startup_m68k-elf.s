@@ -8,4 +8,4 @@
     clr.b   (%a0)+
     bra.s   1b
 2:	
-	jmp c_entry
+	jmp main
