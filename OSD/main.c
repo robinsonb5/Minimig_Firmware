@@ -104,7 +104,7 @@ void HandleFpga(void)
 }
 
 #ifdef __GNUC__
-void main(void)
+void c_entry(void)
 #else
 __geta4 void main(void)
 #endif

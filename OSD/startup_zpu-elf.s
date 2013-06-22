@@ -153,7 +153,7 @@ Boston, MA 02111-1307, USA.  */
 # offset 0x0000 0000
 		.globl _start
 _start:
-		jmp main
+		jmp c_entry
 
         .balign 32,0
 # offset 0x0000 0020
