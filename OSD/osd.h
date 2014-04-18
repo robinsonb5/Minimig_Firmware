@@ -34,7 +34,7 @@
 #define OSDINTENSITY 0x04
 
 #define REPEATDELAY      1000         // repeat delay in 1ms units
-#define REPEATRATE       400          // repeat rate in 1ms units
+#define REPEATRATE       300          // repeat rate in 1ms units
 #define BUTTONDELAY      20          // repeat rate in 1ms units
 
 #define KEY_UPSTROKE     0x80
