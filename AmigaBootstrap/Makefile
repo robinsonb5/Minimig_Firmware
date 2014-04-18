@@ -6,17 +6,29 @@
 ASM=vasmm68k_mot
 ASM_OPTS=
 HEXER=python ../hexer.py
+ROMGENDIR=../romgen
+ROMGEN=$(ROMGENDIR)/romgen
 
-.PRECIOUS: %.bin
+PROJECT=amigaboot
 
 # ----- rules -----
-all: amigaboot.hex
+all: $(PROJECT).hex $(PROJECT).bin $(PROJECT)_ROM.vhd
 
 clean:
-	rm -f amigaboot.hex amigaboot.bin amigaboot.elf
+	rm -f $(PROJECT).hex $(PROJECT).bin $(PROJECT)_ROM.vhd
 	
 %.hex: %.bin
 	$(HEXER) -l 2048 $< $@
 
 %.bin: %.asm
 	$(ASM) $(ASM_OPTS) -Fbin -o $@ $<
+
+%_ROM.vhd: %.bin $(ROMGEN)
+	sed 's/soc_firmware/$*_ROM/' >$*_ROM.vhd <$(ROMGENDIR)/rom_prologue.vhd
+	$(ROMGEN) $*.bin >>$*_ROM.vhd
+	cat >>$*_ROM.vhd $(ROMGENDIR)/rom_epilogue.vhd
+
+$(ROMGEN):
+	cd $ROMGENDIR
+	make
+
