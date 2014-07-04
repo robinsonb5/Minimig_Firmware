@@ -34,7 +34,7 @@ $(LIBC_TARGET): $(LIBC_OBJ)
 	$(AR) -r $(LIBC_TARGET) $(LIBC_OBJ)
 
 $(OUTPUT): $(ELF)
-	$(OBJCOPY) -O binary $(ELF) -j .code $(OUTPUT)
+	$(OBJCOPY) -O binary $(ELF) $(OUTPUT)
 
 $(ELF): $(OBJ) $(LINK_SCRIPT)
 	$(CC) $(LDFLAGS) -o $@ -T $(LINK_SCRIPT) $(OBJ) $(NEWLIB)

@@ -44,21 +44,21 @@ Boston, MA 02111-1307, USA.  */
 
 	.macro  jsr address
 	
-			im 0		; save R0
+			im 8+0		; save R0
 			load
-			im 4		; save R1
+			im 8+4		; save R1
 			load
-			im 8		; save R2
+			im 8+8		; save R2
 			load
 	
 			fixedim \address
 			call
 			
-			im 8
+			im 8+8
 			store		; restore R2
-			im 4
+			im 8+4
 			store		; restore R1
-			im 0
+			im 8+0
 			store		; restore R0
 	.endm
 
@@ -77,15 +77,15 @@ Boston, MA 02111-1307, USA.  */
 	
 	.macro cimpl funcname
 	; save R0
-	im 0
+	im 8+0
 	load
 	
 	; save R1
-	im 4
+	im 8+4
 	load
 	
 	; save R2
-	im 8
+	im 8+8
 	load
 	
 	loadsp 20
@@ -98,22 +98,22 @@ Boston, MA 02111-1307, USA.  */
 	storesp 0
 	storesp 0	
 	 
-	im 0
+	im 8+0
 	load
 	
 	; poke the result into the right slot
 	storesp 24
 
 	; restore R2
-	im 8
+	im 8+8
 	store
 	
 	; restore R1
-	im 4
+	im 8+4
 	store
 	
 	; restore r0
-	im 0
+	im 8+0
 	store
 	
 	
@@ -153,15 +153,37 @@ Boston, MA 02111-1307, USA.  */
 # offset 0x0000 0000
 		.globl _start
 _start:
-		jmp c_entry
+		jmp _premain
+		.balign 8,0
+	.globl _memreg
+_memreg:
+		.long 0
+		.long 0
+		.long 0
+		.long 0
 
         .balign 32,0
 # offset 0x0000 0020
 		.globl _zpu_interrupt_vector
 _zpu_interrupt_vector:
-#		jsr _zpu_interrupt
-		poppc
-
+			im 8+0		; save R0
+			load
+			im 8+4		; save R1
+			load
+			im 8+8		; save R2
+			load
+	
+			fixedim	_inthandler_fptr
+			load
+			call
+			
+			im 8+8
+			store		; restore R2
+			im 8+4
+			store		; restore R1
+			im 8+0
+			store		; restore R0
+			poppc
 
 /* instruction emulation code */
 
@@ -672,15 +694,15 @@ _storeb:
 # offset 0x0000 02a0
 	.balign 32,0
 _div:
-;	cimpl __divsi3
-	breakpoint
+	cimpl __divsi3
+;	breakpoint
 
 # opcode 54
 # offset 0x0000 02c0
 	.balign 32,0
 _mod:
-;	cimpl __modsi3
-	breakpoint;
+	cimpl __modsi3
+;	breakpoint;
 
 # opcode 55
 # offset 0x0000 02e0
@@ -909,8 +931,6 @@ _storebtail:
 	storesp 4
 	poppc
 	
-
-
 	
 _slowmultImpl:
 	
@@ -933,18 +953,37 @@ _slowmultImpl:
 	storesp 4
 	poppc
 
-	.balign 4,0
+	.section ".text","ax"
 	.global _boot
+	.balign 4,0
 _boot:
 	im 0
+	poppc
+
+	.global _break;
+_break:
+	im _break
+	poppc ; infinite loop
+
+
+_default_inthandler:
+	poppc
+
+	.global _inthandler_fptr
+	.balign 4,0
+_inthandler_fptr:
+	.long _default_inthandler
+
+; Define weak linkage for _premain, so that it can be overridden
+	.weak _premain
+_premain:
+	im _break
 	nop
-	im 1	; 1<<PER_FLAGS_OVERLAY
-	nop	; First 4-byte word
-	im 0xffffff8c	; PER_FLAGS
-	store
-	poppc ; should execute without a further fetch
+	im c_entry
+	poppc
 	
-;	.data // This is read only, so we don't really want it in a normal data section
+
+;	.data ; This is read only, so we don't really want it in a normal data section
 	.section ".rodata"
 	.balign 4,0
 _mask:
@@ -953,12 +992,5 @@ _mask:
 	.long 0xffff00ff
 	.long 0xffffff00
 
-	.section ".bss"
-    .balign 4,0
-	.globl _memreg
-_memreg:
-		.long 0
-		.long 0
-		.long 0
-		.long 0
+
 

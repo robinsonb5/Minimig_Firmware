@@ -114,9 +114,11 @@ __geta4 void main(void)
 //    unsigned long time;
 //    unsigned short spiclk;
 
+	printf("Minimig firmware loaded - showing splash screen\n");
+
 	ShowSplash();
 
-    BootPrint("OSD_CA01.SYS is here...\n");
+    BootPrint("Enabling disk LED...\n");
 
     DISKLED_ON;
 

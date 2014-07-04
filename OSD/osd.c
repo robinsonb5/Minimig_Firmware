@@ -156,13 +156,15 @@ static void rotatechar(unsigned char *in,unsigned char *out)
 }
 
 
+static unsigned char tmp[8];
+
 void OsdSetTitle(char *s,int a)
 {
 	// Compose the title, condensing character gaps
 	arrow=a;
-	char zeros=0;
-	char i=0,j=0;
-	char outp=0;
+	int zeros=0;
+	int i=0,j=0;
+	int outp=0;
 	while(1)
 	{
 		int c=s[i++];
@@ -171,7 +173,7 @@ void OsdSetTitle(char *s,int a)
 	        unsigned char *p = &charfont[c][0];
 			for(j=0;j<8;++j)
 			{
-				unsigned char nc=*p++;
+				int nc=*p++;
 				if(nc)
 				{
 					zeros=0;
@@ -206,7 +208,7 @@ void OsdSetTitle(char *s,int a)
 	// Finally rotate it.
 	for(i=0;i<64;i+=8)
 	{
-		unsigned char tmp[8];
+//		unsigned char tmp[8];
 		rotatechar(&titlebuffer[i],tmp);
 		for(c=0;c<8;++c)
 		{
@@ -223,10 +225,10 @@ void OsdWrite(unsigned char n, char *s, unsigned char invert, unsigned char stip
 // write a null-terminated string <s> to the OSD buffer starting at line <n>
 void OsdWriteOffset(unsigned char n, char *s, unsigned char invert, unsigned char stipple,char offset)
 {
-    unsigned short i;
-    unsigned char b;
+    unsigned int i;
+    unsigned int b;
     const unsigned char *p;
-	unsigned char stipplemask=0xff;
+	unsigned int stipplemask=0xff;
 	int linelimit=OSDLINELEN;
 	int arrowmask=arrow;
 	if(n==7 && (arrow & OSD_ARROW_RIGHT))
@@ -355,7 +357,7 @@ void OsdWriteOffset(unsigned char n, char *s, unsigned char invert, unsigned cha
 
 void OsdDrawLogo(unsigned char n, char row,char superimpose)
 {
-    unsigned short i;
+    unsigned int i;
     const unsigned char *p;
 	int linelimit=OSDLINELEN;
 
@@ -450,8 +452,8 @@ void OsdDrawLogo(unsigned char n, char row,char superimpose)
 
 void OsdWriteDoubleSize(unsigned char n, char *s, unsigned char pass)
 {
-    unsigned short i;
-    unsigned char b;
+    unsigned int i;
+    unsigned int b;
     const unsigned char *p;
 	int linelimit=OSDLINELEN;
 

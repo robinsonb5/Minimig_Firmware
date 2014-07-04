@@ -29,6 +29,5 @@ clean:
 	cat >>$*_ROM.vhd $(ROMGENDIR)/rom_epilogue.vhd
 
 $(ROMGEN):
-	cd $ROMGENDIR
-	make
+	make -C $(ROMGENDIR)
 
