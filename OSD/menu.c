@@ -149,7 +149,6 @@ void SelectFile(char* pFileExt, unsigned char Options, unsigned char MenuSelect,
 
 void ShowSplash()
 {
-	printf("Displaying Splash Screen\n");
 	OsdSetTitle("Welcome",0);
     OsdWrite(0, "", 0,0);
 	OsdDrawLogo(1,0,0);

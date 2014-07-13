@@ -32,7 +32,7 @@ unsigned int SwapBB(unsigned int i)
 	);	
 	return i;
 #else
-	short result=(i>>8)&0xff;
+	int result=(i>>8)&0xff;
 	result|=(i<<8)&0xff00;
 	return(result);
 #endif

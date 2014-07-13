@@ -37,12 +37,14 @@ JB:
 
 */
 
-#include <stdio.h>
 #include <string.h>
 //#include <ctype.h>
 #include "mmc.h"
 #include "fat.h"
 #include "swap.h"
+#include "small_printf.h"
+
+#include <stdio.h>
 
 int tolower(int c);
 
@@ -89,7 +91,7 @@ unsigned char t_sort_table[MAXDIRENTRIES];
 extern unsigned long GetTimer(unsigned long);
 extern void ErrorMessage(const char *message, unsigned char code);
 
-
+#if 0
 unsigned long SwapEndianL(unsigned long l)
 {
 	unsigned char c[4];
@@ -99,12 +101,15 @@ unsigned long SwapEndianL(unsigned long l)
 	c[3] = (unsigned char)((l >> 24) & 0xff);
 	return((c[0]<<24)+(c[1]<<16)+(c[2]<<8)+c[3]);
 }
+#endif
 
 void SwapPartitionBytes(int i)
 {
 	// We don't bother to byteswap the CHS geometry fields since we don't use them.
-	partitions[i].startlba=SwapEndianL(partitions[i].startlba);
-	partitions[i].sectors=SwapEndianL(partitions[i].sectors);
+//	partitions[i].startlba=SwapEndianL(partitions[i].startlba);
+//	partitions[i].sectors=SwapEndianL(partitions[i].sectors);
+	partitions[i].startlba=SwapBBBB(partitions[i].startlba);
+	partitions[i].sectors=SwapBBBB(partitions[i].sectors);
 }
 
 extern char BootPrint(const char *s);
@@ -244,6 +249,8 @@ unsigned char FindDrive(void)
 unsigned char FindDrive(void)
 {
     buffered_fat_index = -1;
+
+	int i;
 
     if (!MMC_Read(0, sector_buffer)) // read MBR
         return(0);
@@ -1046,6 +1053,7 @@ char ScanDirectory(unsigned long mode, char *extension, unsigned char options)
                                 }
                             }
                             else if ((mode >= '0' && mode <= '9') || (mode >= 'A' && mode <= 'Z')) // find first entry beginning with given character
+
                             {
                                 if (find_file)
                                     x = tolower(pEntry->Name[0]) >= tolower(mode) && is_file;
@@ -1217,6 +1225,7 @@ unsigned long GetFATLink(unsigned long cluster)
         // remember the index of buffered FAT sector
         buffered_fat_index = fat_index;
     }
+
 
 //    return(fat32 ? fat_buffer.fat32[buffer_index] & 0x0FFFFFFF : fat_buffer.fat16[buffer_index]); // get FAT link
     return(fat32 ? SwapBBBB(fat_buffer.fat32[buffer_index]) & 0x0FFFFFFF : SwapBB(fat_buffer.fat16[buffer_index])); // get FAT link for 68000

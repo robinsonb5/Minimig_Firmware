@@ -131,6 +131,7 @@ __geta4 void main(void)
     printf("Version %s\r\r", version+5);
 
     sprintf(s, "** ARM firmware %s **\n", version + 5);
+	printf(s);
     BootPrint(s);
 
 //	OsdDisable();
