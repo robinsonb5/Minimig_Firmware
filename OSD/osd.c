@@ -753,13 +753,13 @@ void ConfigAutofire(unsigned char autofire)
 }
 
 // get key status
-unsigned char OsdGetCtrl(void)
+int OsdGetCtrl(void)
 {
-    static unsigned char c2;
-    static unsigned long delay;
-    static unsigned long repeat;
-    static unsigned char repeat2;
-    unsigned char c1,c;
+    static unsigned int c2;
+    static unsigned int delay;
+    static unsigned int repeat;
+    static unsigned int repeat2;
+    unsigned int c1,c;
 
     // send command and get current ctrl status
     EnableOsd();
@@ -808,7 +808,7 @@ unsigned char OsdGetCtrl(void)
     return(c);
 }
 
-unsigned char GetASCIIKey(unsigned char keycode)
+unsigned int GetASCIIKey(unsigned int keycode)
 {
     if (keycode & KEY_UPSTROKE)
        return 0;

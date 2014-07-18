@@ -58,6 +58,8 @@ char debugmsg2[40];
 //    }
 //}
 
+static char filename[12];
+
 
 static void RDBChecksum(unsigned long *p)
 {
@@ -163,9 +165,10 @@ static void FakeRDB(int unit,int block)
 }
 
 
-void IdentifyDevice(unsigned short *pBuffer, unsigned char unit)
+void IdentifyDevice(unsigned short *pBuffer, int unit)
 { // builds Identify Device struct
-    char *p, i, x;
+    char *p;
+	int i, x;
     unsigned long total_sectors = hdf[unit].cylinders * hdf[unit].heads * hdf[unit].sectors;
 
     memset(pBuffer, 0, 512);
@@ -244,12 +247,12 @@ void IdentifyDevice(unsigned short *pBuffer, unsigned char unit)
     pBuffer[58] = (unsigned short)(total_sectors >> 16);
 }
 
-unsigned long chs2lba(unsigned short cylinder, unsigned char head, unsigned short sector, unsigned char unit)
+unsigned long chs2lba(int cylinder, int head, int sector, int unit)
 {
     return(cylinder * hdf[unit].heads + head) * hdf[unit].sectors + sector - 1;
 }
 
-void WriteTaskFile(unsigned char error, unsigned char sector_count, unsigned char sector_number, unsigned char cylinder_low, unsigned char cylinder_high, unsigned char drive_head)
+void WriteTaskFile(unsigned int error, unsigned int sector_count, unsigned int sector_number, unsigned int cylinder_low, unsigned int cylinder_high, unsigned int drive_head)
 {
     EnableFpga();
 
@@ -281,7 +284,7 @@ void WriteTaskFile(unsigned char error, unsigned char sector_count, unsigned cha
     DisableFpga();
 }
 
-void WriteStatus(unsigned char status)
+void WriteStatus(unsigned int status)
 {
     EnableFpga();
 
@@ -295,17 +298,18 @@ void WriteStatus(unsigned char status)
     DisableFpga();
 }
 
-void HandleHDD(unsigned char c1, unsigned char c2)
+static unsigned short id[256];
+static unsigned char  tfr[8];
+
+void HandleHDD(unsigned int c1, unsigned int c2)
 {
-    unsigned short id[256];
-    unsigned char  tfr[8];
-    unsigned short i;
-    unsigned short sector;
-    unsigned short cylinder;
-    unsigned char  head;
-    unsigned char  unit;
-    unsigned short sector_count;
-    unsigned short block_count;
+    unsigned int i;
+    unsigned int sector;
+    unsigned int cylinder;
+    unsigned int  head;
+    unsigned int  unit;
+    unsigned int sector_count;
+    unsigned int block_count;
 
     if (c1 & CMD_IDECMD)
     {
@@ -904,10 +908,9 @@ unsigned char HardFileSeek(hdfTYPE *pHDF, unsigned long lba)
     return FileSeek(&pHDF->file, lba, SEEK_SET);
 }
 
-unsigned char OpenHardfile(unsigned char unit)
+unsigned char OpenHardfile(unsigned int unit)
 {
     unsigned long time;
-    char filename[12];
 
 	switch(config.hardfile[unit].enabled)
 	{

@@ -46,15 +46,16 @@ typedef struct
     unsigned long  index_size;
 } hdfTYPE;
 
-void IdentifyDevice(unsigned short *pBuffer, unsigned char unit);
-unsigned long chs2lba(unsigned short cylinder, unsigned char head, unsigned short sector, unsigned char unit);
-void WriteTaskFile(unsigned char error, unsigned char sector_count, unsigned char sector_number, unsigned char cylinder_low, unsigned char cylinder_high, unsigned char drive_head);
-void WriteStatus(unsigned char status);
-void HandleHDD(unsigned char c1, unsigned char c2);
+void IdentifyDevice(unsigned short *pBuffer, int unit);
+unsigned long chs2lba(int cylinder, int head, int sector, int unit);
+void WriteTaskFile(unsigned int error, unsigned int sector_count, unsigned int sector_number, unsigned int cylinder_low,
+	unsigned int cylinder_high, unsigned int drive_head);
+void WriteStatus(unsigned int status);
+void HandleHDD(unsigned int c1, unsigned int c2);
 void GetHardfileGeometry(hdfTYPE *hdf);
 void BuildHardfileIndex(hdfTYPE *hdf);
 unsigned char HardFileSeek(hdfTYPE *hdf, unsigned long lba);
-unsigned char OpenHardfile(unsigned char unit);
+unsigned char OpenHardfile(unsigned int unit);
 
 #define HDF_FILETYPE_UNKNOWN 0
 #define HDF_FILETYPE_NOTFOUND 1

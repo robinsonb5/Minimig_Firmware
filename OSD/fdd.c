@@ -48,13 +48,15 @@ adfTYPE df[4];            // drive 0 information structure
 #define LAST_SECTOR (SECTOR_COUNT - 1)
 #define GAP_SIZE (TRACK_SIZE - SECTOR_COUNT * SECTOR_SIZE)
 
+static unsigned char checksum[4];
+
 // sends the data in the sector buffer to the FPGA, translated into an Amiga floppy format sector
 // note that we do not insert clock bits because they will be stripped by the Amiga software anyway
 void SendSector(unsigned char *pData, unsigned char sector, unsigned char track, unsigned char dsksynch, unsigned char dsksyncl)
 {
-    unsigned char checksum[4];
-    unsigned short i;
-    unsigned char x;
+//    unsigned char checksum[4];
+    unsigned int i;
+    unsigned int x;
     unsigned char *p;
 
     // preamble
@@ -157,7 +159,7 @@ void SendSector(unsigned char *pData, unsigned char sector, unsigned char track,
 
 void SendGap(void)
 {
-    unsigned short i = GAP_SIZE;
+    unsigned int i = GAP_SIZE;
     while (i--)
         SPI(0xAA);
 }
@@ -166,11 +168,11 @@ void SendGap(void)
 void ReadTrack(adfTYPE *drive)
 { // track number is updated in drive struct before calling this function
 
-    unsigned char sector;
-    unsigned char status;
-    unsigned char track;
-    unsigned short dsksync;
-    unsigned short dsklen;
+    unsigned int sector;
+    unsigned int status;
+    unsigned int track;
+    unsigned int dsksync;
+    unsigned int dsklen;
     //unsigned short n;
 
     if (drive->track >= drive->tracks)
@@ -299,8 +301,8 @@ void ReadTrack(adfTYPE *drive)
 unsigned char FindSync(adfTYPE *drive)
 // reads data from fifo till it finds sync word or fifo is empty and dma inactive (so no more data is expected)
 {
-    unsigned char  c1, c2, c3, c4;
-    unsigned short n;
+    unsigned int  c1, c2, c3, c4;
+    unsigned int n;
 
     while (1)
     {
@@ -343,9 +345,9 @@ unsigned char FindSync(adfTYPE *drive)
 unsigned char GetHeader(unsigned char *pTrack, unsigned char *pSector)
 // this function reads data from fifo till it finds sync word or dma is inactive
 {
-    unsigned char c, c1, c2, c3, c4;
-    unsigned char i;
-    unsigned char checksum[4];
+    unsigned int c, c1, c2, c3, c4;
+    unsigned int i;
+//    unsigned char checksum[4];
 
     Error = 0;
     while (1)
@@ -487,11 +489,11 @@ unsigned char GetHeader(unsigned char *pTrack, unsigned char *pSector)
 
 unsigned char GetData(void)
 {
-    unsigned char c, c1, c2, c3, c4;
-    unsigned char i;
+    unsigned int c, c1, c2, c3, c4;
+    unsigned int i;
     unsigned char *p;
-    unsigned short n;
-    unsigned char checksum[4];
+    unsigned int n;
+//    unsigned char checksum[4];
 
     Error = 0;
     while (1)
@@ -603,9 +605,9 @@ unsigned char GetData(void)
 
 void WriteTrack(adfTYPE *drive)
 {
-    unsigned char sector;
-    unsigned char Track;
-    unsigned char Sector;
+    unsigned int sector;
+    unsigned int Track;
+    unsigned int Sector;
 
     // setting file pointer to begining of current track
     file.cluster = drive->cache[drive->track];
@@ -670,7 +672,7 @@ void UpdateDriveStatus(void)
 
 void HandleFDD(unsigned char c1, unsigned char c2)
 {
-    unsigned char sel;
+    unsigned int sel;
     drives = (c1 >> 4) & 0x03; // number of active floppy drives
 
     if (c1 & CMD_RDTRK)

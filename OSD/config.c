@@ -23,10 +23,12 @@ unsigned char romkey[3072];
 
 RAFile romfile;
 
+static char filename[12];
+
 char UploadKickstart(char *name)
 {
 	int keysize=0;
-    char filename[12];
+//    char filename[12];
     strncpy(filename, name, 8); // copy base name
     strcpy(&filename[8], "ROM"); // add extension
 
@@ -144,9 +146,9 @@ unsigned char ConfigurationExists(char *filename)
 unsigned char LoadConfiguration(char *filename)
 {
     static const char config_id[] = "MNMGCFG0";
-	char updatekickstart=0;
-	char result=0;
-    unsigned char key;
+	int updatekickstart=0;
+	int result=0;
+    unsigned int key;
 
 	if(!filename)
 		filename=configfilename;	// Use slot-based filename if none provided.
