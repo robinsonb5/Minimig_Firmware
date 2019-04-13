@@ -22,6 +22,7 @@
 void _boot();
 void _break();
 
+extern int prg_start;
 
 int main(int argc,char **argv)
 {
@@ -33,7 +34,7 @@ int main(int argc,char **argv)
 	{
 		puts("Hunting for partition\n");
 		FindDrive();
-		if(LoadFile("OSDZPU01SYS",0))
+		if(LoadFile("OSDZPU01SYS",&prg_start))
 		{
 			_boot();
 		}

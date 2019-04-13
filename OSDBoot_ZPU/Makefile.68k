@@ -1,7 +1,7 @@
-BASE	= zpu-elf
+BASE	= m68k-elf
 CC      = $(BASE)-gcc
 LD      = $(BASE)-gcc
-AS      = $(BASE)-as
+AS = vasmm68k_mot
 CP      = $(BASE)-objcopy
 DUMP    = $(BASE)-objdump
 
@@ -9,7 +9,7 @@ ZPUFLEXDIR = ../../ZPUFlex
 ROMGEN = $(ZPUFLEXDIR)/Firmware/zpuromgen
 
 # we use mincrt0.s from here
-STARTUP_DIR = $(ZPUFLEXDIR)/Firmware/startup
+STARTUP_DIR = .
 
 # we fetch ROM prologue / epilogue from here
 RTL_DIR = $(ZPUFLEXDIR)/RTL/
@@ -17,10 +17,10 @@ RTL_DIR = $(ZPUFLEXDIR)/RTL/
 # we use printf from here
 COMMON_DIR = .
 
-BUILD_DIR=zpu_obj
-HWBUILD_DIR=zpu_obj_hw
+BUILD_DIR=m68k_obj
+HWBUILD_DIR=m68k_obj_hw
 
-MINSTARTUP_SRC = $(STARTUP_DIR)/mincrt0.s $(STARTUP_DIR)/premain.s
+MINSTARTUP_SRC = $(STARTUP_DIR)/start68k.s
 MINSTARTUP_OBJ = $(patsubst $(STARTUP_DIR)/%.s,$(BUILD_DIR)/%.o,$(MINSTARTUP_SRC))
 
 COMMON_SRC = $(COMMON_DIR)/small_printf.c $(COMMON_DIR)/swap.c $(COMMON_DIR)/swap.h
@@ -29,24 +29,21 @@ COMMON_OBJ = $(patsubst $(COMMON_DIR)/%.c,$(BUILD_DIR)/%.o,$(COMMON_SRC))
 HW_SRC = fpga.c fpga.h spi.c spi.h uart.c
 HW_OBJ = $(patsubst %.c,$(HWBUILD_DIR)/%.o,$(HW_SRC))
 
-MAIN_PRJ = OSDBoot
+MAIN_PRJ = OSDBoot_68k
 MAIN_SRC = boot.c minfat.c minfat.h
 MAIN_OBJ = $(COMMON_OBJ) $(HW_OBJ) $(patsubst %.c,$(BUILD_DIR)/%.o,$(MAIN_SRC))
 
-LINKMAP  = linkscript.ld
+LINKMAP  = linkscript_68k.ld
 
 
 # Commandline options for each tool.
 
-ZPUOPTS= -mno-poppcrel -mno-pushspadd -mno-callpcrel -mno-byteop -mno-shortop -mno-neg -mno-div -mno-mod # No-neg requires bugfixed toolchain
-CFLAGS  = -I. -I$(COMMON_DIR)/ -c -Os $(ZPUOPTS) -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
+CFLAGS  = -I. -I$(COMMON_DIR)/ -c -Os -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
 
 # We need to compile the bit-banging stuff with storeh/storeb support.
-ZPUOPTS_HW= -mno-poppcrel -mno-pushspadd -mno-callpcrel -mno-neg -mno-div -mno-mod # No-neg requires bugfixed toolchain
-CFLAGS_HW  = -I. -I$(COMMON_DIR)/ -c -Os $(ZPUOPTS_HW) -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
+CFLAGS_HW  = -I. -I$(COMMON_DIR)/ -c -Os -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
 
-
-LFLAGS  = -nostartfiles -nostdlib -Wl,--relax -Os
+LFLAGS  = -nostartfiles -Wl,--relax -Os
 
 
 # Our target.
@@ -91,12 +88,11 @@ $(BUILD_DIR)/%.o: $(COMMON_DIR)/%.c Makefile
 $(HWBUILD_DIR)/%.o: $(COMMON_DIR)/%.c Makefile
 	$(CC) $(CFLAGS_HW)  -o $@ -c $<
 
-
 $(BUILD_DIR)/%.o: %.s
-	$(AS) -o $@ $<
+	$(AS) -m68000 -Felf -o $@ $<
 
 $(BUILD_DIR)/%.o: $(STARTUP_DIR)/%.s
-	$(AS) -o $@ $<
+	$(AS) -m68000 -Felf -o $@ $<
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
