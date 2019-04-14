@@ -39,7 +39,7 @@ LINKMAP  = linkscript.ld
 # Commandline options for each tool.
 
 ZPUOPTS= -mno-poppcrel -mno-pushspadd -mno-callpcrel -mno-byteop -mno-shortop -mno-neg -mno-div -mno-mod # No-neg requires bugfixed toolchain
-CFLAGS  = -I. -I$(COMMON_DIR)/ -c -Os $(ZPUOPTS) -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
+CFLAGS  = -DOSDNAME=\"OSDZPU01SYS\" -I. -I$(COMMON_DIR)/ -c -Os $(ZPUOPTS) -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
 
 # We need to compile the bit-banging stuff with storeh/storeb support.
 ZPUOPTS_HW= -mno-poppcrel -mno-pushspadd -mno-callpcrel -mno-neg -mno-div -mno-mod # No-neg requires bugfixed toolchain
