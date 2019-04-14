@@ -20,5 +20,5 @@ SECTIONS
 	. = . + 0x1000; /* 64kB of heap memory */
 	heap_top = .; /* for _sbrk */
 
-	stack_top = 0x1000; /* for startup.s */
+	stack_top = 0x1ffe; /* for startup.s */
 }

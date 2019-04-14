@@ -787,7 +787,7 @@ int OsdGetCtrl(void)
     c2 = c1;
 
     // generate repeat "key-pressed" events
-    if (c1 & KEY_UPSTROKE)
+    if (c1 & KEY_UPSTROKE || c1==0)
     {
         repeat = GetTimer(REPEATDELAY);
     }
