@@ -37,13 +37,13 @@ LINKMAP  = linkscript_68k.ld
 
 # Commandline options for each tool.
 
-CFLAGS  = -DNULL=0 -I. -I$(COMMON_DIR)/ -c -Os -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
+CFLAGS  = -DOSDNAME=\"OSD_CA01SYS\" -DNULL=0 -I. -I$(COMMON_DIR)/ -c -Os -m68000 -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
 
 # We need to compile the bit-banging stuff with storeh/storeb support.
-CFLAGS_HW  = -I. -I$(COMMON_DIR)/ -c -Os -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
+CFLAGS_HW  = -I. -I$(COMMON_DIR)/ -c -Os -m68000 -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
 
 LFLAGS  = -nostartfiles -nostdlib -Wl,--relax -Os
-
+LIBS = -lgcc
 
 # Our target.
 all: $(BUILD_DIR) $(HWBUILD_DIR) $(MAIN_PRJ).bin $(MAIN_PRJ)_ROM.vhd $(MAIN_PRJ).rpt
@@ -78,13 +78,13 @@ $(ROMGEN): ../romgen/romgen.c
 $(MAIN_PRJ).elf: $(MINSTARTUP_OBJ) $(MAIN_OBJ)
 	$(LD) $(LFLAGS) -T $(LINKMAP) -o $@ $+ $(LIBS)
 
-$(BUILD_DIR)/%.o: %.c Makefile
+$(BUILD_DIR)/%.o: %.c Makefile.68k
 	$(CC) $(CFLAGS)  -o $@ -c $<
 
-$(BUILD_DIR)/%.o: $(COMMON_DIR)/%.c Makefile
+$(BUILD_DIR)/%.o: $(COMMON_DIR)/%.c Makefile.68k
 	$(CC) $(CFLAGS)  -o $@ -c $<
 
-$(HWBUILD_DIR)/%.o: $(COMMON_DIR)/%.c Makefile
+$(HWBUILD_DIR)/%.o: $(COMMON_DIR)/%.c Makefile.68k
 	$(CC) $(CFLAGS_HW)  -o $@ -c $<
 
 $(BUILD_DIR)/%.o: %.s

@@ -240,10 +240,14 @@ int spi_init()
 	DBG("Card responded to reset\n");
 	SDHCtype=is_sdhc();
 	if(SDHCtype)
+	{
 		DBG("SDHC card detected\n");
-
-	DBG("Sending cmd16\n");
-	cmd_CMD16(1);
+	}
+	else
+	{
+		DBG("Sending cmd16\n");
+		cmd_CMD16(1);
+	}
 	SPI(0xFF);
 	DisableCard();
 //	SPI_CS(0);
