@@ -380,6 +380,6 @@ int LoadFile(const char *fn, unsigned char *buf)
 		printf("Can't open %s\n",fn);
 		return(0);
 	}
-	return(1);
+	return(file.size);
 }
 

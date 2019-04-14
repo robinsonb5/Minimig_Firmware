@@ -50,7 +50,7 @@ LFLAGS  = -nostartfiles -nostdlib -Wl,--relax -Os
 
 
 # Our target.
-all: $(BUILD_DIR) $(HWBUILD_DIR) $(MAIN_PRJ).bin $(MAIN_PRJ)_ROM.vhd $(MAIN_PRJ).rpt
+all: $(BUILD_DIR) $(HWBUILD_DIR) $(MAIN_PRJ).bin $(MAIN_PRJ)_ROM.vhd $(MAIN_PRJ).rpt mkchecksum
 
 clean:
 	rm -f $(BUILD_DIR)/*.o *.hex *.elf *.map *.lst *.srec $(MAIN_PRJ).rom *~ */*.o *.bin
@@ -71,6 +71,9 @@ clean:
 
 $(ROMGEN): $(ZPUFLEXDIR)/Firmware/zpuromgen.c
 	gcc -o $(ZPUFLEXDIR)/Firmware/zpuromgen $(ZPUFLEXDIR)/Firmware/zpuromgen.c
+
+mkchecksum: mkchecksum.c checksum.c
+	gcc -o $@ $+
 
 %_ROM.vhd: %.bin $(ROMGEN)
 	sed 's/dualportram/$*_ROM/' >$*_ROM.vhd <$(RTL_DIR)/rom_prologue.vhd

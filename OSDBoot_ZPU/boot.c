@@ -17,12 +17,32 @@
 
 #include "spi.h"
 #include "minfat.h"
+#include "checksum.h"
 #include "small_printf.h"
 
 void _boot();
 void _break();
 
 extern char prg_start;
+
+char printbuf[32];
+
+void cvx(int val,char *buf)
+{
+	int i;
+	int c;
+	for(i=0;i<8;++i)
+	{
+		c=(val>>28)&0xf;
+		val<<=4;
+		if(c>9)
+			c+='A'-10;
+		else
+			c+='0';
+		*buf++=c;
+	}
+}
+
 
 int main(int argc,char **argv)
 {
@@ -35,8 +55,30 @@ int main(int argc,char **argv)
 		puts("Hunting for partition\n");
 		if(FindDrive())
 		{
-			if(LoadFile(OSDNAME,&prg_start))
+			int romsize;
+			int *checksums;
+			if(romsize=LoadFile(OSDNAME,&prg_start))
 			{
+				char *sector=&prg_start;
+				romsize+=3;
+				romsize&=0xfffffffc;
+				checksums=(int *)(sector+romsize);
+				if(LoadFile("CHECKSUMBIN",(char*)checksums))
+				{
+					while(romsize>511)
+					{
+						int sum=checksum(sector,512);
+						int sum2=*checksums++;
+						if(sum!=sum2)
+						{
+							cvx(sum,&printbuf[0]);
+							printbuf[8]='0';
+							cvx(sum2,&printbuf[9]);
+							printbuf[17]=0;
+							BootPrint(printbuf);
+						}
+					}
+				}
 				_boot();
 			}
 			BootPrint("Can't load firmware\n");

@@ -29,7 +29,7 @@ HW_SRC = fpga.c fpga.h spi.c spi.h uart.c
 HW_OBJ = $(patsubst %.c,$(HWBUILD_DIR)/%.o,$(HW_SRC))
 
 MAIN_PRJ = OSDBoot_68k
-MAIN_SRC = boot.c minfat.c minfat.h
+MAIN_SRC = boot.c minfat.c minfat.h checksum.c checksum.h
 MAIN_OBJ = $(COMMON_OBJ) $(HW_OBJ) $(patsubst %.c,$(BUILD_DIR)/%.o,$(MAIN_SRC))
 
 LINKMAP  = linkscript_68k.ld
