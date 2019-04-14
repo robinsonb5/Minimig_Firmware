@@ -44,6 +44,8 @@ JB:
 
 #include "spi.h"
 
+#include "fpga.h"
+
 #include "minfat.h"
 #include "swap.h"
 #include "small_printf.h"
@@ -107,7 +109,7 @@ unsigned char FindDrive(void)
         return(0);
 	}
 
-	puts("MBR successfully read\n");
+	BootPrint("MBR successfully read\n");
 
 	boot_sector=0;
 	partitioncount=1;
@@ -117,6 +119,12 @@ unsigned char FindDrive(void)
 		partitioncount=0;
     if (compare((const char*)&sector_buffer[0x52], "FAT32   ",8)==0) // check for FAT32
 		partitioncount=0;
+
+    if (compare((const char*)&sector_buffer[0x52], "FAT12   ",8)==0) // check for FAT12
+    {
+	BootPrint("FAT12 not supported - please use a FAT16 or FAT32 card");
+	return(0);
+    }
 
 	printf("Partitioncount %d\n",partitioncount);
 
@@ -146,6 +154,7 @@ unsigned char FindDrive(void)
 	else if (compare(sector_buffer+0x36, "FAT16   ",8)!=0) // check for FAT32
 	{
         printf("Unsupported partition type!\r");
+	BootPrint("Only FAT16 and FAT32 are supported\n");
 		return(0);
 	}
 

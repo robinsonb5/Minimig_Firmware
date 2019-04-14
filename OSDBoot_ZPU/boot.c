@@ -22,25 +22,32 @@
 void _boot();
 void _break();
 
-extern int prg_start;
+extern char prg_start;
 
 int main(int argc,char **argv)
 {
 	int i;
 
-//	BootPrint("Initializing SD card\n");
+	BootPrint("Initializing SD card\n");
 	puts("Initializing SD card\n");
 	if(spi_init())
 	{
 		puts("Hunting for partition\n");
-		FindDrive();
-		if(LoadFile(OSDNAME,&prg_start))
+		if(FindDrive())
 		{
-			_boot();
+			if(LoadFile(OSDNAME,&prg_start))
+			{
+				_boot();
+			}
+			BootPrint("Can't load firmware\n");
 		}
-		puts("Can't load firmware\n");
+		else
+		{
+			BootPrint("Unable to locate partition\n");
+			puts("Unable to locate partition\n");
+		}
 	}
-	puts("Failed to initialize SD card\n");
+	BootPrint("Failed to initialize SD card\n");
 	return(0);
 }
 
