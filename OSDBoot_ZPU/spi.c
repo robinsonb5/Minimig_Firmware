@@ -219,15 +219,16 @@ int spi_init()
 	int r;
 	SDHCtype=1;
 	SPI_slow();
-	DisableCard();
-//	SPI_CS(0);	// Disable CS
-	spi_spin();
-	DBG("Activating CS\n");
-//	SPI_CS(1);
-	EnableCard();
 	i=8;
 	while(--i)
 	{
+		DisableCard();
+	//	SPI_CS(0);	// Disable CS
+		spi_spin();
+		DBG("Activating CS\n");
+	//	SPI_CS(1);
+		EnableCard();
+		SPI(0xff);
 		if(cmd_reset()==1) // Enable SPI mode
 			i=1;
 		DBG("Sent reset command\n");
