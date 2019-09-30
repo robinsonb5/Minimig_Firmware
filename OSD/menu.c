@@ -515,7 +515,7 @@ void HandleUI(void)
         break;
 
     case MENU_MAIN2_2 :
-
+		printf("From menu perspective, config is %x\n",(int)&config);
         if (menu)
             menustate = MENU_NONE1;
         else if (select)

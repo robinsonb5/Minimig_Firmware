@@ -42,7 +42,7 @@ JB:
 #include "mmc.h"
 #include "fat.h"
 #include "swap.h"
-#include "small_printf.h"
+// #include "small_printf.h"
 
 #include <stdio.h>
 
@@ -1514,7 +1514,9 @@ unsigned char FileCreate(unsigned long iDirectory, fileTYPE *file)
 //                            pEntry->FileSize = file->size;
                             pEntry->StartCluster = (unsigned short)SwapBB(cluster); // for 68000
                             pEntry->HighCluster = fat32 ? (unsigned short)SwapBB(cluster >> 16) : 0; // for 68000
+							printf("FileCreate() filesize (before endian swap) is %lx\n",file->size);
                             pEntry->FileSize = SwapBBBB(file->size); // for 68000
+							printf("FileCreate() filesize (after endian swap) is %lx\n",pEntry->FileSize);
 
                             // store dir entry
                             if (!MMC_Write(iDirectorySector - 1, sector_buffer))

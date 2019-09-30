@@ -88,7 +88,6 @@ int cmd_write(unsigned long cmd, unsigned long lba)
 	putchar('0'+(result>>4));
 	putchar('0'+(result&15));
 	#endif
-	printf("Got result %d \n",result);
 
 	return(result);
 }
@@ -273,7 +272,7 @@ int sd_read_sector(unsigned long lba,unsigned char *buf)
 	int result=0;
 	int i;
 	int r;
-	printf("sd_read_sector %d, %d\n",lba,buf);
+//	printf("sd_read_sector %d, %d\n",lba,buf);
 	SPI(0xff);
 
 	EnableCard();
