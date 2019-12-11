@@ -1,4 +1,4 @@
-	section .text
+	section .fixed_vectors
 
 Start:
 	move.l #stack_top,a7

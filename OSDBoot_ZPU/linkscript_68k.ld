@@ -20,7 +20,7 @@ SECTIONS
   . = 0x0000000;
   .fixed_vectors :
   {
-    KEEP(*fixed_vectors*) /* Seed section, allows -gc-sections */
+    KEEP(*(.fixed_vectors*)) /* Seed section, allows -gc-sections */
   }>BOOT
 
   /* Remaining code sections */

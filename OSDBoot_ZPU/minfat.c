@@ -347,7 +347,7 @@ int LoadFile(const char *fn, unsigned char *buf)
 {
 	if(FileOpen(&file,fn))
 	{
-		puts("Opened file, loading...\n");
+//		puts("Opened file, loading...\n");
 		int imgsize=(file.size+511)/512;
 		int c=0;
 		int sector=0;

@@ -87,7 +87,10 @@ int main(int argc,char **argv)
 					}
 				}
 				if(!error)
-					_boot();
+				{
+//					((void (*)(void))prg_start)();
+//					_boot();
+				}
 			}
 			else
 				BootPrint("Can't load firmware\n");
