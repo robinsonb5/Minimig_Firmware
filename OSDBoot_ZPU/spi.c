@@ -88,7 +88,6 @@ int cmd_write(unsigned long cmd, unsigned long lba)
 	putchar('0'+(result>>4));
 	putchar('0'+(result&15));
 	#endif
-	printf("Got result %d \n",result);
 
 	return(result);
 }
@@ -219,15 +218,16 @@ int spi_init()
 	int r;
 	SDHCtype=1;
 	SPI_slow();
-	DisableCard();
-//	SPI_CS(0);	// Disable CS
-	spi_spin();
-	DBG("Activating CS\n");
-//	SPI_CS(1);
-	EnableCard();
 	i=8;
 	while(--i)
 	{
+		DisableCard();
+	//	SPI_CS(0);	// Disable CS
+		spi_spin();
+		DBG("Activating CS\n");
+	//	SPI_CS(1);
+		EnableCard();
+		SPI(0xff);
 		if(cmd_reset()==1) // Enable SPI mode
 			i=1;
 		DBG("Sent reset command\n");
@@ -272,7 +272,7 @@ int sd_read_sector(unsigned long lba,unsigned char *buf)
 	int result=0;
 	int i;
 	int r;
-	printf("sd_read_sector %d, %d\n",lba,buf);
+//	printf("sd_read_sector %d, %d\n",lba,buf);
 	SPI(0xff);
 
 	EnableCard();

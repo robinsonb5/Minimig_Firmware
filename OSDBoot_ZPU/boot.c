@@ -59,7 +59,9 @@ int main(int argc,char **argv)
 			int *checksums;
 			if(romsize=LoadFile(OSDNAME,&prg_start))
 			{
+				int error=0;
 				char *sector=&prg_start;
+				int offset=0;
 				romsize+=3;
 				romsize&=0xfffffffc;
 				checksums=(int *)(sector+romsize);
@@ -67,21 +69,28 @@ int main(int argc,char **argv)
 				{
 					while(romsize>511)
 					{
-						int sum=checksum(sector,512);
+						int sum=checksum(sector+offset,512);
 						int sum2=*checksums++;
+						offset+=512;
+						romsize-=512;
 						if(sum!=sum2)
 						{
-							cvx(sum,&printbuf[0]);
-							printbuf[8]='0';
-							cvx(sum2,&printbuf[9]);
-							printbuf[17]=0;
+							++error;
+							cvx(offset,&printbuf[0]);
+							printbuf[8]=' ';
+							cvx(sum,&printbuf[9]);
+							printbuf[17]=' ';
+							cvx(sum2,&printbuf[18]);
+							printbuf[26]=0;
 							BootPrint(printbuf);
 						}
 					}
 				}
-				_boot();
+				if(!error)
+					_boot();
 			}
-			BootPrint("Can't load firmware\n");
+			else
+				BootPrint("Can't load firmware\n");
 		}
 		else
 		{
@@ -89,7 +98,10 @@ int main(int argc,char **argv)
 			puts("Unable to locate partition\n");
 		}
 	}
-	BootPrint("Failed to initialize SD card\n");
+	else
+		BootPrint("Failed to initialize SD card\n");
+	while(1)
+		;
 	return(0);
 }
 

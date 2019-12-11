@@ -2,9 +2,9 @@
 TARGET=m68k-elf
 ARCH=68000
 DEFS=
-ID=68K
+ID=_CA
 
-C_SRC=fat.c fdd.c fpga.c hardware.c  hdd.c main.c menu.c mmc.c osd.c printf.c swap.c config.c rafile.c small_printf.c
+C_SRC=fat.c fdd.c fpga.c hardware.c  hdd.c main.c menu.c mmc.c osd.c printf.c swap.c config.c rafile.c hexdump.c # small_printf.c
 KLIBC_SRC=vsnprintf.c sprintf.c memcpy.c memcmp.c strcpy.c strcat.c strncat.c strncmp.c strlen.c memset.c strncpy.c strchr.c
 A_SRC=startup_$(TARGET).s
 
@@ -18,7 +18,7 @@ CC=$(TARGET)-gcc
 AR=$(TARGET)-ar
 OBJCOPY=$(TARGET)-objcopy
 CFLAGS+=$(DEFS) -m$(ARCH) -Wall -Wno-char-subscripts -Os -fno-common -fomit-frame-pointer -I./include -DACTIONREPLAY_BROKEN
-LDFLAGS+=-m$(ARCH) -Xlinker -Map=menu.map -nostartfiles -L$(BUILD_DIR)
+LDFLAGS+=-m$(ARCH) -Xlinker -Map=menu.map -nostartfiles -nostdlib -lgcc -L$(BUILD_DIR)
 
 ELF=$(BUILD_DIR)/menu.elf
 OUTPUT=OSD$(ID)01.sys
@@ -37,7 +37,7 @@ $(OUTPUT): $(ELF)
 	$(OBJCOPY) -O binary $(ELF) $(OUTPUT)
 
 $(ELF): $(OBJ) $(LINK_SCRIPT)
-	$(CC) $(LDFLAGS) -o $@ -T $(LINK_SCRIPT) $(OBJ) $(NEWLIB)
+	$(CC) -o $@ -T $(LINK_SCRIPT) $(OBJ) $(LIBC_OBJ) $(LDFLAGS) 
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
