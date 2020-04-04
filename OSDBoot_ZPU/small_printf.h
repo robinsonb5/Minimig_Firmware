@@ -6,8 +6,10 @@
 #define printf(x,...)
 #define puts(x)
 #else
+#ifndef __EIGHTTHIRTYTWO__
 int small_printf(const char *fmt, ...);
 #define printf small_printf
+#endif
 #endif
 
 #endif

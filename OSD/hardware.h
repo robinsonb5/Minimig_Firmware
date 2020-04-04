@@ -29,7 +29,6 @@
 #define SPI_slow()  *(volatile unsigned short *)0xda4008=0x20
 #define SPI_fast()  *(volatile unsigned short *)0xda4008=0x01   //14MHz/2
 
-#ifdef __GNUC__
 // Yuk.  The following monstrosity does a dummy read from the timer register, writes, then reads from
 // the SPI register.  Doing it this way works around a timing issue with ADF writing when GCC optimisation is turned on.
 //#define SPI(x) (*(volatile unsigned short *)0xDEE010,*(volatile unsigned char *)0xda4000=x,*(volatile unsigned char *)0xda4000)
@@ -51,6 +50,17 @@
 //   Bit 14 -> Scandoubler enable
 //   Bit 15 -> Turbo chipram enable/disable
 
+// static inline unsigned char SPI(unsigned char o)
+//{	
+//	volatile unsigned char *ptr = (volatile unsigned char *)0xda4000;
+//	*ptr = o;
+//	return *ptr;
+//}
+#if 0
+#define SPI  *(unsigned char *)0xda4000=
+#define SPIN
+#endif
+
 #define PLATFORM (*(volatile unsigned short *)0xDEE014)
 #define PLATFORM_TURBOCHIP 4
 #define PLATFORM_RECONFIG 5
@@ -63,17 +73,6 @@
 // Write to this register to reconfigure the FPGA on devices which support such operations.
 #define RECONFIGURE (*(volatile unsigned short *)0xDEE016)
 
-
-// static inline unsigned char SPI(unsigned char o)
-//{	
-//	volatile unsigned char *ptr = (volatile unsigned char *)0xda4000;
-//	*ptr = o;
-//	return *ptr;
-//}
-#else
-#define SPI  *(unsigned char *)0xda4000=
-#define SPIN
-#endif
 	
 #define RDSPI  *(volatile unsigned char *)0xda4001
 #define RS232  *(volatile unsigned char *)0xda8001=

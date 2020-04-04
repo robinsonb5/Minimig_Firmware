@@ -43,9 +43,9 @@ DummyIntHandler
 
 	xdef _boot
 
-_boot
-	pea	prg_start
-	rts
+;_boot
+;	pea	prg_start
+;	rts
 
 ; Interrupt handler table, modified by C code.
 IntHandler1 dc.l	DummyIntHandler

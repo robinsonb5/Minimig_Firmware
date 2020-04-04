@@ -19,11 +19,17 @@
 #include "minfat.h"
 #include "checksum.h"
 #include "small_printf.h"
+#include "fpga.h"
 
-void _boot();
+void _boot()
+{
+	void (*entry)();
+	entry=(void (*)())prg_start;
+	entry();
+}
+
 void _break();
 
-extern char prg_start;
 
 char printbuf[32];
 
@@ -57,10 +63,10 @@ int main(int argc,char **argv)
 		{
 			int romsize;
 			int *checksums;
-			if(romsize=LoadFile(OSDNAME,&prg_start))
+			if(romsize=LoadFile(OSDNAME,prg_start))
 			{
 				int error=0;
-				char *sector=&prg_start;
+				char *sector=(char *)prg_start;
 				int offset=0;
 				romsize+=3;
 				romsize&=0xfffffffc;

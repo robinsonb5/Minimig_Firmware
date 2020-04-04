@@ -1,0 +1,70 @@
+BASE	= 
+832DIR = ../../EightThirtyTwo
+CC      = $(832DIR)/vbcc/bin/vbcc832
+GCC		= gcc
+LD      = $(832DIR)/832a/832l
+AS      = $(832DIR)/832a/832a
+CP      = objcopy
+DUMP    = objdump
+
+BUILD_DIR = 832obj
+LIB_DIR=$(832DIR)/lib832
+INCLUDE_DIR = $(832DIR)/include
+STARTUP_DIR = $(832DIR)/Lib
+
+ROMGENDIR = $(832DIR)/romgen
+ROMGEN = $(ROMGENDIR)/romgen
+
+PROJECT=OSDBoot_832
+
+### flags ###
+
+CFLAGS  = -+ -c99 -Dprg_start=0x2000 -DOSDNAME=\"832OSD01BIN\" -O=1311 -size -DNULL=0 -I. -I$(INCLUDE_DIR)/ -I$(COMMON_DIR)/ -I../OSD/
+ASFLAGS = -eb
+LDFLAGS  = -eb -s_STACKSIZE=0x240
+ROMGENFLAGS = 
+
+### variables ###
+
+# headers
+HEADERS=spr_defs.h or32_defs.h hardware.h string.h swap.h errors.h mmc.h fat.h
+
+# common sources
+COMMON_SOURCES=$(BUILD_DIR)/boot.o $(BUILD_DIR)/fpga.o $(BUILD_DIR)/spi.o $(BUILD_DIR)/swap.o \
+	$(BUILD_DIR)/minfat.o $(BUILD_DIR)/uart.o $(BUILD_DIR)/checksum.o
+ 
+# all sources
+ALL_SOURCES = $(LIB_DIR)/crt0.a $(LIB_DIR)/libtiny832.a $(ASM_SOURCES) $(COMMON_SOURCES)
+
+### build rules ###
+
+all: $(PROJECT).bin $(PROJECT)_ROM.vhd
+
+$(PROJECT).bin: Makefile.832 $(ALL_SOURCES)
+	$(LD) $(LDFLAGS) -m $(PROJECT).map -o $@ $(ALL_SOURCES)
+
+# clean
+clean:
+	@echo clean
+	@rm -rf $(BUILD_DIR)/*.o
+
+%_ROM.vhd: %.bin $(ROMGEN)
+	sed 's/dualportram/$*/' >$*_ROM.vhd <$(ROMGENDIR)/rom_prologue.vhd
+	$(ROMGEN) $(ROMGENFLAGS) $*.bin >>$*_ROM.vhd
+	cat >>$*_ROM.vhd $(ROMGENDIR)/rom_epilogue.vhd
+
+%.asm: %.c
+	$(CC) $(CFLAGS) -o=$@ $<
+
+$(BUILD_DIR)/%.o: %.asm $(BUILD_DIR)
+	$(AS) $(ASFLAGS) -o $@ $<
+
+$(BUILD_DIR)/%.o: $(STARTUP_DIR)/%.S $(BUILD_DIR) 
+	$(AS) $(ASFLAGS) -o $@ $<
+
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR)
+
+$(ROMGEN): $(ROMGENDIR)/romgen.c
+	gcc -o $(ROMGENDIR)/romgen $(ROMGENDIR)/romgen.c
+

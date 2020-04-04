@@ -132,10 +132,10 @@ unsigned char FindDrive(void)
 	{
 		// We have at least one partition, parse the MBR.
 		struct MasterBootRecord *mbr=(struct MasterBootRecord *)sector_buffer;
-
-		boot_sector = mbr->Partition[0].startlba;
+		struct PartitionEntry *pe=(struct PartitionEntry*)&mbr->Partition[0][0];
+		boot_sector = pe->startlba;
 		if(mbr->Signature==0x55aa)
-				boot_sector=SwapBBBB(mbr->Partition[0].startlba);
+				boot_sector=SwapBBBB(pe->startlba);
 		else if(mbr->Signature!=0xaa55)
 		{
 			puts("No partition signature found\n");
