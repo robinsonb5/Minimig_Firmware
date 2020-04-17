@@ -12,14 +12,19 @@ LIB_DIR=$(832DIR)/lib832
 INCLUDE_DIR = $(832DIR)/include
 STARTUP_DIR = $(832DIR)/Lib
 
-ROMGENDIR = $(832DIR)/romgen
-ROMGEN = $(ROMGENDIR)/romgen
+ROMGEN = ../romgen/romgen
+
+# we use mincrt0.s from here
+STARTUP_DIR = .
+
+# we fetch ROM prologue / epilogue from here
+RTL_DIR = ../romgen/
 
 PROJECT=OSDBoot_832
 
 ### flags ###
 
-CFLAGS  = -+ -c99 -Dprg_start=0x2000 -DOSDNAME=\"832OSD01BIN\" -O=1311 -size -DNULL=0 -I. -I$(INCLUDE_DIR)/ -I$(COMMON_DIR)/ -I../OSD/
+CFLAGS  = -+ -c99 -Dprg_start=0x2000 -DOSDNAME=\"832OSD01BIN\" -O=1311 -size -unsigned-char -DNULL=0 -I. -I$(INCLUDE_DIR)/ -I$(COMMON_DIR)/ -I../OSD/
 ASFLAGS = -eb
 LDFLAGS  = -eb -s_STACKSIZE=0x240
 ROMGENFLAGS = 
@@ -31,27 +36,30 @@ HEADERS=spr_defs.h or32_defs.h hardware.h string.h swap.h errors.h mmc.h fat.h
 
 # common sources
 COMMON_SOURCES=$(BUILD_DIR)/boot.o $(BUILD_DIR)/fpga.o $(BUILD_DIR)/spi.o $(BUILD_DIR)/swap.o \
-	$(BUILD_DIR)/minfat.o $(BUILD_DIR)/uart.o $(BUILD_DIR)/checksum.o
+	$(BUILD_DIR)/minfat.o $(BUILD_DIR)/uart.o $(BUILD_DIR)/checksum.o $(BUILD_DIR)/hexdump.o
  
 # all sources
-ALL_SOURCES = $(LIB_DIR)/crt0.a $(LIB_DIR)/libtiny832.a $(ASM_SOURCES) $(COMMON_SOURCES)
+ALL_SOURCES = $(LIB_DIR)/crt0.a $(ASM_SOURCES) $(COMMON_SOURCES) $(LIB_DIR)/lib832.a 
 
 ### build rules ###
 
 all: $(PROJECT).bin $(PROJECT)_ROM.vhd
 
 $(PROJECT).bin: Makefile.832 $(ALL_SOURCES)
-	$(LD) $(LDFLAGS) -m $(PROJECT).map -o $@ $(ALL_SOURCES)
+	$(LD) $(LDFLAGS) -M $(PROJECT).map -o $@ $(ALL_SOURCES)
 
 # clean
 clean:
 	@echo clean
 	@rm -rf $(BUILD_DIR)/*.o
 
+$(ROMGEN): ../romgen/romgen.c
+	make -C ../romgen/
+
 %_ROM.vhd: %.bin $(ROMGEN)
-	sed 's/dualportram/$*/' >$*_ROM.vhd <$(ROMGENDIR)/rom_prologue.vhd
-	$(ROMGEN) $(ROMGENFLAGS) $*.bin >>$*_ROM.vhd
-	cat >>$*_ROM.vhd $(ROMGENDIR)/rom_epilogue.vhd
+	sed 's/soc_firmware/$*_ROM/' >$*_ROM.vhd <$(RTL_DIR)/rom_prologue.vhd
+	$(ROMGEN) $*.bin >>$*_ROM.vhd
+	cat >>$*_ROM.vhd $(RTL_DIR)/rom_epilogue.vhd
 
 %.asm: %.c
 	$(CC) $(CFLAGS) -o=$@ $<
@@ -64,7 +72,4 @@ $(BUILD_DIR)/%.o: $(STARTUP_DIR)/%.S $(BUILD_DIR)
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
-
-$(ROMGEN): $(ROMGENDIR)/romgen.c
-	gcc -o $(ROMGENDIR)/romgen $(ROMGENDIR)/romgen.c
 

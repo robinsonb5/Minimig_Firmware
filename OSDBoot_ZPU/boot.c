@@ -20,6 +20,7 @@
 #include "checksum.h"
 #include "small_printf.h"
 #include "fpga.h"
+#include "uart.h"
 
 void _boot()
 {
@@ -54,8 +55,8 @@ int main(int argc,char **argv)
 {
 	int i;
 
-	BootPrint("Initializing SD card\n");
 	puts("Initializing SD card\n");
+	BootPrint("Initializing SD card\n");
 	if(spi_init())
 	{
 		puts("Hunting for partition\n");

@@ -24,11 +24,10 @@ int SDHCtype;
 #define cmd_CMD55(x) cmd_write(0xff0077,0)
 #define cmd_CMD58(x) cmd_write(0xff007A,0)
 
-#ifdef SPI_DEBUG
-#define DBG(x) puts(x)
-#else
+// #define DBG(x) puts(x)
+#define SPI_DEBUG 0
 #define DBG(X)
-#endif
+
 
 unsigned char SPI_R1[6];
 
@@ -112,20 +111,24 @@ int wait_initV2()
 	{
 		if((r=cmd_CMD55())==1)
 		{
-			printf("CMD55 %d\n",r);
+			if(SPI_DEBUG)
+				printf("CMD55 %d\n",r);
 			SPI(0xff);
 			if((r=cmd_CMD41())==0)
 			{
-				printf("CMD41 %d\n",r);
+				if(SPI_DEBUG)
+					printf("CMD41 %d\n",r);
 				SPI(0xff);
 				return(1);
 			}
 			else
-				printf("CMD41 %d\n",r);
+				if(SPI_DEBUG)
+					printf("CMD41 %d\n",r);
 			spi_spin();
 		}
 		else
-			printf("CMD55 %d\n",r);
+			if(SPI_DEBUG)
+				printf("CMD55 %d\n",r);
 	}
 	return(0);
 }
@@ -141,12 +144,14 @@ int wait_init()
 	{
 		if((r=cmd_init())==0)
 		{
-			printf("init %d\n  ",r);
+			if(SPI_DEBUG)
+				printf("init %d\n  ",r);
 			SPI(0xff);
 			return(1);
 		}
 		else
-			printf("init %d\n  ",r);
+			if(SPI_DEBUG)
+				printf("init %d\n  ",r);
 		spi_spin();
 	}
 	return(0);
@@ -170,7 +175,8 @@ int is_sdhc()
 	r=SPI_PUMP();
 	if((r&0xffff)!=0x01aa)
 	{
-		printf("CMD8_4 response: %d\n",r);
+		if(SPI_DEBUG)
+			printf("CMD8_4 response: %d\n",r);
 		wait_init();
 		return(0);
 	}
@@ -186,10 +192,12 @@ int is_sdhc()
 		{
 			if((r=cmd_CMD58())==0)
 			{
-				printf("CMD58 %d\n  ",r);
+				if(SPI_DEBUG)
+					printf("CMD58 %d\n  ",r);
 				SPI(0xff);
 				r=SPI_READ();
-				printf("CMD58_2 %d\n  ",r);
+				if(SPI_DEBUG)
+					printf("CMD58_2 %d\n  ",r);
 				SPI(0xff);
 				SPI(0xff);
 				SPI(0xff);
@@ -200,11 +208,13 @@ int is_sdhc()
 					return(0);
 			}
 			else
-				printf("CMD58 %d\n  ",r);
+				if(SPI_DEBUG)
+					printf("CMD58 %d\n  ",r);
 		}
 		if(i==2)
 		{
-			printf("SDHC Initialization error!\n");
+			if(SPI_DEBUG)
+				printf("SDHC Initialization error!\n");
 			return(0);
 		}
 	}
@@ -284,7 +294,8 @@ int sd_read_sector(unsigned long lba,unsigned char *buf)
 	r=cmd_read(lba);
 	if(r!=0)
 	{
-		printf("Read command failed at %d (%d)\n",lba,r);
+		if(SPI_DEBUG)
+			printf("Read command failed at %d (%d)\n",lba,r);
 		return(result);
 	}
 

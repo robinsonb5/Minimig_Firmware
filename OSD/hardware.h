@@ -33,9 +33,10 @@
 // the SPI register.  Doing it this way works around a timing issue with ADF writing when GCC optimisation is turned on.
 //#define SPI(x) (*(volatile unsigned short *)0xDEE010,*(volatile unsigned char *)0xda4000=x,*(volatile unsigned char *)0xda4000)
 
-#define SPI(x) (*(volatile unsigned char *)0xda4000=x,*(volatile unsigned char *)0xda4000)
+#define SPI(x) (*(volatile unsigned char *)0xda4001=x,(volatile)*(unsigned char *)0xda4001)
+#define SPIW(x) (*(volatile unsigned short *)0xda4000=x,(volatile)*(unsigned short *)0xda4000)
 
-#define SPIN (*(volatile unsigned short *)0xDEE010)	// Waste a few cycles to let the FPGA catch up
+#define SPIN {char v=(volatile)*(unsigned short *)0xDEE010;}	// Waste a few cycles to let the FPGA catch up
 
 // A 16-bit register for platform-specific config.
 // On read:
@@ -74,7 +75,7 @@
 #define RECONFIGURE (*(volatile unsigned short *)0xDEE016)
 
 	
-#define RDSPI  *(volatile unsigned char *)0xda4001
+#define RDSPI  (volatile)*(volatile unsigned char *)0xda4001
 #define RS232  *(volatile unsigned char *)0xda8001=
  
 

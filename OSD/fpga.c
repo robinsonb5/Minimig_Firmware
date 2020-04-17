@@ -315,14 +315,13 @@ void SendFileEncrypted(RAFile *file,unsigned char *key,int keysize)
     printf("]\r");
 }
 
-
 // print message on the boot screen
 char BootPrint(const char *text)
 {
-    unsigned char c1, c2, c3, c4;
-    unsigned char cmd;
+    unsigned int c1, c2, c3, c4;
+    unsigned int cmd;
     const char *p;
-    unsigned char n;
+    unsigned int n;
 
     p = text;
     n = 0;
@@ -390,6 +389,68 @@ char BootPrint(const char *text)
     DisableFpga();
     return 0;
 }
+
+#if 0
+// print message on the boot screen
+int BootPrint(const char *text)
+{
+    unsigned int c1, c2, c3, c4;
+    unsigned int cmd;
+    const char *p;
+    unsigned int n;
+
+    p = text;
+    n = 0;
+    while (*p++ != 0)
+        n++; // calculating string length
+	n+=2;
+	cmd=1;
+
+    while (1)
+    {
+        EnableFpga();
+		c1 = SPIW(0x1001);
+		SPIW(0);
+        c3 = SPIW(0);
+
+        if (c1 & (CMD_RDTRK<<8))
+        {
+            if (cmd)
+            { // command phase
+                if (c3 == 0x8006) // command packet size must be 12 bytes
+                {
+                    cmd = 0;
+                    SPIW(CMD_HDRID); // command header
+					SPIW(0x0001);
+                    // data packet size in bytes
+					SPIW(0x0000);
+					SPIW(n);
+                    // don't care
+					SPIW(0x0000);
+					SPIW(0x0000);
+                }
+            }
+            else
+            { // data phase
+                if (c3 == (0x8000 | (n >> 1)))
+                {
+                    p = text;
+                    while (n--)
+                    {
+                        c4 = *p;
+                        SPI(c4);
+                        if (c4) // if current character is not zero go to next one
+                            p++;
+                    }
+                    DisableFpga();
+                    return 1;
+                }
+            }
+        }
+        DisableFpga();
+    }
+}
+#endif
 
 char PrepareBootUpload(unsigned char base, unsigned char size)
 // this function sends given file to Minimig's memory
@@ -481,12 +542,13 @@ void BootExit(void)
                 SPI(0x00);
                 SPI(0x00);
                 SPI(0x00);
+				break;
             }
-            DisableFpga();
-            return;
         }
         DisableFpga();
     }
+	DisableFpga();
+	return;
 }
 
 void ClearMemory(unsigned long base, unsigned long size)

@@ -268,6 +268,7 @@ unsigned char FindDrive(void)
 	{
 		// We have at least one partition, parse the MBR.
 		struct MasterBootRecord *mbr=(struct MasterBootRecord *)sector_buffer;
+		BootPrint("Copying partitions");
 		memcpy(&partitions[0],&mbr->Partition[0],sizeof(struct PartitionEntry));
 		memcpy(&partitions[1],&mbr->Partition[1],sizeof(struct PartitionEntry));
 		memcpy(&partitions[2],&mbr->Partition[2],sizeof(struct PartitionEntry));
