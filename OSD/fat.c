@@ -735,8 +735,6 @@ char ScanDirectory(unsigned long mode, char *extension, unsigned char options)
         nEntries = fat32 ?  cluster_size << 4 : root_directory_size << 4; // 16 entries per sector
     }
 
-	printf("pentry size is %x\n",sizeof(DIRENTRY));
-
     while (1)
     {
         for (iEntry = 0; iEntry < nEntries; iEntry++)
@@ -760,7 +758,6 @@ char ScanDirectory(unsigned long mode, char *extension, unsigned char options)
             }
             else
                 pEntry++;
-			printf("pentry %x, sector_buffer %x\n",(int)pEntry,(int)&sector_buffer[0]);
 
             if (pEntry->Name[0] != SLOT_EMPTY && pEntry->Name[0] != SLOT_DELETED) // valid entry??
             {
@@ -1178,25 +1175,19 @@ char ScanDirectory(unsigned long mode, char *extension, unsigned char options)
         if (iCurrentDirectory || fat32) // subdirectory is a linked cluster chain
         {
             iDirectoryCluster = GetFATLink(iDirectoryCluster); // get next cluster in chain
-			printf("iDirectoryCluster: %x\n",iDirectoryCluster);
+//			printf("iDirectoryCluster: %x\n",iDirectoryCluster);
 			// check if end of chain
             if (fat32 ? (iDirectoryCluster & 0x0FFFFFF8) == 0x0FFFFFF8 : (iDirectoryCluster & 0xFFF8) == 0xFFF8)
                 break; // no more clusters in chain
 
 			// calculate first sector address of the new cluster
             iDirectorySector = data_start + cluster_size * (iDirectoryCluster - 2);
-			printf("New directory sector: %x\n",iDirectorySector);
+//			printf("New directory sector: %x\n",iDirectorySector);
         }
         else
             break;
     }
 
-	for(i=0;i<MAXDIRENTRIES;++i)
-	{
-		printf("%d -> %d\n",i,sort_table[i]);
-		hexdump(&DirEntry[i],sizeof(DIRENTRY));
-
-	}
 
     if (nNewEntries)
     {

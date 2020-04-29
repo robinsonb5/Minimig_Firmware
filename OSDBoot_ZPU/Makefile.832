@@ -52,6 +52,7 @@ $(PROJECT).bin: Makefile.832 $(ALL_SOURCES)
 clean:
 	@echo clean
 	@rm -rf $(BUILD_DIR)/*.o
+	@rm *.asm
 
 $(ROMGEN): ../romgen/romgen.c
 	make -C ../romgen/
