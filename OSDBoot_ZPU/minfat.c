@@ -49,6 +49,7 @@ JB:
 #include "minfat.h"
 #include "swap.h"
 #include "small_printf.h"
+#include "hexdump.h"
 
 #define tolower(x) (x|32)
 
@@ -105,7 +106,7 @@ unsigned char FindDrive(void)
 
     if (!sd_read_sector(0, sector_buffer)) // read MBR
 	{
-		puts("Read of MBR failed\n");
+		BootPrint("Read of MBR failed\n");
         return(0);
 	}
 
@@ -132,10 +133,11 @@ unsigned char FindDrive(void)
 	{
 		// We have at least one partition, parse the MBR.
 		struct MasterBootRecord *mbr=(struct MasterBootRecord *)sector_buffer;
-
-		boot_sector = mbr->Partition[0].startlba;
+		struct PartitionEntry *pe=(struct PartitionEntry*)&mbr->Partition[0][0];
+		hexdump(sector_buffer,512);
+		boot_sector = pe->startlba;
 		if(mbr->Signature==0x55aa)
-				boot_sector=SwapBBBB(mbr->Partition[0].startlba);
+				boot_sector=SwapBBBB(pe->startlba);
 		else if(mbr->Signature!=0xaa55)
 		{
 			puts("No partition signature found\n");
@@ -146,6 +148,7 @@ unsigned char FindDrive(void)
 		    return(0);
 		puts("Read boot sector from first partition\n");
 	}
+	hexdump(sector_buffer,512);
 
 	printf("Hunting for filesystem\n");
 

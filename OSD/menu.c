@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "firmware.h"
 #include "config.h"
 #include "menu.h"
+#include "hexdump.h"
 
 #define OSDCOLOR_TOPLEVEL 0x01
 #define OSDCOLOR_SUBMENU 0x03
@@ -390,6 +391,8 @@ void HandleUI(void)
 				{
 					menumask|=(1<<i);	// Make enabled drives selectable
 
+					printf("Disk %d status: %x\n",i,df[i].status);
+					hexdump(&df[i],sizeof(adfTYPE));
 				    if (df[i].status & DSK_INSERTED) // floppy disk is inserted
 				    {
 				        strncpy(&s[6], df[i].name, sizeof(df[0].name));
@@ -515,7 +518,7 @@ void HandleUI(void)
         break;
 
     case MENU_MAIN2_2 :
-
+		printf("From menu perspective, config is %x\n",(int)&config);
         if (menu)
             menustate = MENU_NONE1;
         else if (select)

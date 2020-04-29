@@ -29,7 +29,7 @@ HW_SRC = fpga.c fpga.h spi.c spi.h uart.c
 HW_OBJ = $(patsubst %.c,$(HWBUILD_DIR)/%.o,$(HW_SRC))
 
 MAIN_PRJ = OSDBoot_68k
-MAIN_SRC = boot.c minfat.c minfat.h checksum.c checksum.h
+MAIN_SRC = boot.c minfat.c minfat.h checksum.c checksum.h hexdump.c
 MAIN_OBJ = $(COMMON_OBJ) $(HW_OBJ) $(patsubst %.c,$(BUILD_DIR)/%.o,$(MAIN_SRC))
 
 LINKMAP  = linkscript_68k.ld
@@ -37,7 +37,7 @@ LINKMAP  = linkscript_68k.ld
 
 # Commandline options for each tool.
 
-CFLAGS  = -DOSDNAME=\"OSD_CA01SYS\" -DNULL=0 -I. -I$(COMMON_DIR)/ -g -c -Os -m68000 -ffunction-sections -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX
+CFLAGS  = -Dprg_start=0x2000 -DOSDNAME=\"OSD_CA01SYS\" -DNULL=0 -I. -I$(COMMON_DIR)/ -g -c -Os -m68000 -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX -
 
 # We need to compile the bit-banging stuff with storeh/storeb support.
 CFLAGS_HW  = -I. -I$(COMMON_DIR)/ -g -c -Os -m68000 -ffunction-sections -DDISABLE_UART_RX -DPRINTF_HEX_ONLY # -DDISABLE_PRINTF -DDISABLE_UART_TX

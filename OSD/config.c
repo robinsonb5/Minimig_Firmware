@@ -10,6 +10,8 @@
 #include "menu.h"
 #include "config.h"
 
+#include "hexdump.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -405,12 +407,15 @@ unsigned char SaveConfiguration(char *filename)
         strncpy(file.name, filename, 11);
         file.attributes = 0;
         file.size = sizeof(config);
+        printf("Config size is %x (%x) - address is %x\n",sizeof(config),file.size,&config);
         if (FileCreate(0, &file))
         {
             printf("File created.\r");
             printf("Trying to write new data...\r");
             memset((void*)sector_buffer, 0, sizeof(sector_buffer));
             memcpy((void*)sector_buffer, (void*)&config, sizeof(config));
+
+			hexdump(sector_buffer,sizeof(config));
 
             if (FileWrite(&file, sector_buffer))
             {

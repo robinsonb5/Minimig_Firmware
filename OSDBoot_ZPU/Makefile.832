@@ -1,94 +1,75 @@
 BASE	= 
-CC      = vbcc/vbcc832
+832DIR = ../../EightThirtyTwo
+CC      = $(832DIR)/vbcc/bin/vbcc832
 GCC		= gcc
-LD      = gcc
-AS      = as
+LD      = $(832DIR)/832a/832l
+AS      = $(832DIR)/832a/832a
 CP      = objcopy
 DUMP    = objdump
 
-832DIR = ../EightThirtyTwo
-ROMGENDIR=$(832DIR)/romgen
-ROMGEN = $(ROMGENDIR)/romgen
-
-# we use mincrt0.s from here
+BUILD_DIR = 832obj
+LIB_DIR=$(832DIR)/lib832
+INCLUDE_DIR = $(832DIR)/include
 STARTUP_DIR = $(832DIR)/Lib
 
+ROMGEN = ../romgen/romgen
+
+# we use mincrt0.s from here
+STARTUP_DIR = .
+
 # we fetch ROM prologue / epilogue from here
-RTL_DIR = $(832DIR)/romgen/
+RTL_DIR = ../romgen/
 
-# we use printf from here
-COMMON_DIR = $(832DIR)/Lib
+PROJECT=OSDBoot_832
 
-BUILD_DIR=832_obj
+### flags ###
 
-MINSTARTUP_SRC = $(STARTUP_DIR)/start.S
-MINSTARTUP_OBJ = $(patsubst $(STARTUP_DIR)/%.S,$(BUILD_DIR)/%.o,$(MINSTARTUP_SRC))
+CFLAGS  = -+ -c99 -Dprg_start=0x2000 -DOSDNAME=\"832OSD01BIN\" -O=1311 -size -unsigned-char -DNULL=0 -I. -I$(INCLUDE_DIR)/ -I$(COMMON_DIR)/ -I../OSD/
+ASFLAGS = -eb
+LDFLAGS  = -eb -s_STACKSIZE=0x240
+ROMGENFLAGS = 
 
-COMMON_SRC = $(COMMON_DIR)/small_printf.c $(COMMON_DIR)/swap.c
-COMMON_OBJ = $(patsubst $(COMMON_DIR)/%.c,$(BUILD_DIR)/%.o,$(COMMON_SRC))
+### variables ###
 
-MAIN_PRJ = OSDBoot
-MAIN_SRC = boot.c minfat.c minfat.h fpga.c fpga.h spi.c spi.h uart.c checksum.c
-MAIN_OBJ = $(COMMON_OBJ) $(patsubst %.c,$(BUILD_DIR)/%.o,$(MAIN_SRC))
+# headers
+HEADERS=spr_defs.h or32_defs.h hardware.h string.h swap.h errors.h mmc.h fat.h
 
-LINKMAP  = linkscript_832.ld
+# common sources
+COMMON_SOURCES=$(BUILD_DIR)/boot.o $(BUILD_DIR)/fpga.o $(BUILD_DIR)/spi.o $(BUILD_DIR)/swap.o \
+	$(BUILD_DIR)/minfat.o $(BUILD_DIR)/uart.o $(BUILD_DIR)/checksum.o $(BUILD_DIR)/hexdump.o
+ 
+# all sources
+ALL_SOURCES = $(LIB_DIR)/crt0.a $(ASM_SOURCES) $(COMMON_SOURCES) $(LIB_DIR)/lib832.a 
 
+### build rules ###
 
-# Commandline options for each tool.
+all: $(PROJECT).bin $(PROJECT)_ROM.vhd
 
-ZPUOPTS= -mno-poppcrel -mno-pushspadd -mno-callpcrel -mno-byteop -mno-shortop -mno-neg -mno-div -mno-mod # No-neg requires bugfixed toolchain
-CFLAGS  = -+ -O=1311 -DNULL=0 -DOSDNAME=\"OSD83201SYS\" -I. -I$(COMMON_DIR)/ -I../OSD/ -DDISABLE_UART_RX -DPRINTF_HEX_ONLY
+$(PROJECT).bin: Makefile.832 $(ALL_SOURCES)
+	$(LD) $(LDFLAGS) -M $(PROJECT).map -o $@ $(ALL_SOURCES)
 
-LFLAGS  = -Wl,--gc-sections -nostartfiles -nostdlib -Wl,--relax -Os
-
-
-# Our target.
-all: $(BUILD_DIR) $(MAIN_PRJ).bin $(MAIN_PRJ)_ROM.vhd $(MAIN_PRJ).rpt mkchecksum
-
+# clean
 clean:
-	rm -f $(BUILD_DIR)/*.o *.hex *.elf *.map *.lst *.srec $(MAIN_PRJ).rom *~ */*.o *.bin
+	@echo clean
+	@rm -rf $(BUILD_DIR)/*.o
+	@rm *.asm
 
-%.S: %.c Makefile.832
-	$(CC) $(CFLAGS) -o=$@ $<
-
-# Convert ELF binary to bin file.
-%.bin: %.elf
-	$(CP) -O binary $< $@
-
-%.rpt: %.elf
-	echo >$@ -n "End of code:\t"
-	$(DUMP) -x $< | grep >>$@ _romend
-	echo >>$@ -n "Start of BSS:\t"
-	$(DUMP) -x $< | grep  >>$@ __bss_start__
-	echo >>$@ -n "End of BSS:\t"
-	$(DUMP) -x $< | grep >>$@ __bss_end__
-	cat $@
-
-$(ROMGEN): $(ROMGENDIR)/romgen.c
-	gcc -o $(ROMGENDIR)/romgen $(ROMGENDIR)/romgen.c
-
-mkchecksum: mkchecksum.c checksum.c
-	gcc -o $@ $+
+$(ROMGEN): ../romgen/romgen.c
+	make -C ../romgen/
 
 %_ROM.vhd: %.bin $(ROMGEN)
-	sed 's/dualportram/$*_ROM/' >$*_ROM.vhd <$(RTL_DIR)/rom_prologue.vhd
+	sed 's/soc_firmware/$*_ROM/' >$*_ROM.vhd <$(RTL_DIR)/rom_prologue.vhd
 	$(ROMGEN) $*.bin >>$*_ROM.vhd
 	cat >>$*_ROM.vhd $(RTL_DIR)/rom_epilogue.vhd
 
-# Link - this produces an ELF binary.
-
-$(MAIN_PRJ).elf: $(MINSTARTUP_OBJ) $(MAIN_OBJ)
-	$(LD) $(LFLAGS) -T $(LINKMAP) -o $@ $+ $(LIBS)
-
-./%.S: ../EightThirtyTwo/Lib/%.c Makefile.832
+%.asm: %.c
 	$(CC) $(CFLAGS) -o=$@ $<
 
+$(BUILD_DIR)/%.o: %.asm $(BUILD_DIR)
+	$(AS) $(ASFLAGS) -o $@ $<
 
-$(BUILD_DIR)/%.o: %.S
-	$(GCC) -c -I$(COMMON_DIR) -o $@ $<
-
-$(BUILD_DIR)/%.o: $(STARTUP_DIR)/%.S
-	$(GCC) -c -I$(COMMON_DIR) -o $@ $<
+$(BUILD_DIR)/%.o: $(STARTUP_DIR)/%.S $(BUILD_DIR) 
+	$(AS) $(ASFLAGS) -o $@ $<
 
 $(BUILD_DIR):
 	mkdir $(BUILD_DIR)
